@@ -5,8 +5,9 @@ import Html exposing (..)
 import Html.Attributes exposing (class, id, value)
 import Html.Events exposing (onInput, onSubmit)
 import Http exposing (request)
-import Json.Decode exposing (Decoder, string, int, succeed)
-import Json.Decode.Pipeline exposing (required, optional)
+import Json.Decode exposing (Decoder, int, string, succeed)
+import Json.Decode.Pipeline exposing (optional, required)
+
 
 main : Program String Model Msg
 main =
@@ -85,18 +86,22 @@ update msg model =
             ( { model | searchText = input }
             , Cmd.none
             )
+
         Search ->
             ( { model | searchText = "" }
             , fetchProfile model.searchText model.githubPass
             )
+
         LoadProfile (Ok profile) ->
             ( { model | profile = Just profile }
             , Cmd.none
             )
+
         LoadProfile (Err error) ->
             ( { model | error = Just error }
             , Cmd.none
             )
+
 
 fetchProfile : String -> String -> Cmd Msg
 fetchProfile usernameSearch githubPass =
@@ -110,9 +115,11 @@ fetchProfile usernameSearch githubPass =
         , tracker = Nothing
         }
 
+
 authorisationHeader : String -> Http.Header
 authorisationHeader password =
-  Http.header "Authorization" ("Basic " ++ password)
+    Http.header "Authorization" ("Basic " ++ password)
+
 
 profileDecoder : Decoder Profile
 profileDecoder =
@@ -132,6 +139,8 @@ profileDecoder =
         |> required "followers" int
         |> required "following" int
         |> required "created_at" string
+
+
 
 -- VIEW
 
