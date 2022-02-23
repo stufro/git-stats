@@ -163,15 +163,28 @@ viewProfile : Maybe Profile -> Html Msg
 viewProfile maybeProfile =
     case maybeProfile of
         Just profile ->
-          div
-            [ class "profile-summary" ]
-            [
-              div
-                [ class "profile-avatar" ]
-                [ img [ src profile.avatarUrl ] [] ]
-            , div
-                [ class "profile-name" ]
-                [ text profile.name ]
+          div []
+            [ viewProfileSummary profile
             ]
         Nothing ->
           div [] []
+
+viewProfileSummary : Profile -> Html Msg
+viewProfileSummary profile =
+    div
+      [ class "profile-summary" ]
+      [
+        div
+          [ class "profile-avatar" ]
+          [ img [ src profile.avatarUrl ] [] ]
+      , div
+          [ class "profile-details" ]
+          [ div [ class "profile-name" ] [ text profile.username ]
+          , div [ class "profile-meta-data" ] [ text profile.name ]
+          , div [ class "profile-meta-data" ] [ text profile.location ]
+          , div [ class "profile-meta-data" ] [ text profile.company ]
+          , div [ class "profile-meta-data" ] [ text profile.blog ]
+          , div [ class "profile-meta-data" ] [ text profile.email ]
+          , div [ class "profile-meta-data" ] [ text profile.twitterUsername ]
+          ]
+      ]
