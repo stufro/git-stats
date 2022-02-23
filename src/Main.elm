@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Browser exposing (element)
 import Html exposing (..)
-import Html.Attributes exposing (class, id, value)
+import Html.Attributes exposing (class, id, value, src)
 import Html.Events exposing (onInput, onSubmit)
 import Http exposing (request)
 import Json.Decode exposing (Decoder, int, string, succeed)
@@ -156,4 +156,22 @@ view model =
                 ]
                 []
             ]
+        , viewProfile model.profile
         ]
+
+viewProfile : Maybe Profile -> Html Msg
+viewProfile maybeProfile =
+    case maybeProfile of
+        Just profile ->
+          div
+            [ class "profile-summary" ]
+            [
+              div
+                [ class "profile-avatar" ]
+                [ img [ src profile.avatarUrl ] [] ]
+            , div
+                [ class "profile-name" ]
+                [ text profile.name ]
+            ]
+        Nothing ->
+          div [] []
