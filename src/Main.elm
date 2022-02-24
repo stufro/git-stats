@@ -7,6 +7,7 @@ import Html.Events exposing (onInput, onSubmit)
 import Http exposing (request)
 import Json.Decode exposing (Decoder, int, string, succeed)
 import Json.Decode.Pipeline exposing (optional, required)
+import Html.Attributes exposing (placeholder)
 
 
 main : Program String Model Msg
@@ -171,6 +172,7 @@ view model =
                 [ input
                     [ onInput UpdateSearchBox
                     , value model.searchText
+                    , placeholder "Enter GitHub Username"
                     ]
                     []
                 ]
@@ -183,8 +185,9 @@ viewProfile : Maybe Profile -> Html Msg
 viewProfile maybeProfile =
     case maybeProfile of
         Just profile ->
-            div []
+            div [ class "profile" ]
                 [ viewProfileSummary profile
+                , viewProfileCards profile
                 ]
 
         Nothing ->
@@ -202,28 +205,50 @@ viewProfileSummary profile =
             [ class "profile-details" ]
             [ div [ class "profile-name" ] [ text profile.username ]
             , div [ class "profile-meta-data" ]
-                  [ div [] [ i [ class "fa fa-user" ] [] ]
-                  , span [] [ text profile.name ]
-                  ]
-            , div [ class "profile-meta-data" ] 
-                  [ div [] [ i [ class "fa fa-location-dot" ] [] ]
-                  , span [] [ text profile.location ]
-                  ]
+                [ div [] [ i [ class "fa fa-user" ] [] ]
+                , span [] [ text profile.name ]
+                ]
             , div [ class "profile-meta-data" ]
-                  [ div [] [ i [ class "fa fa-suitcase" ] [] ]
-                  , span [] [ text profile.company ]
-                  ]
+                [ div [] [ i [ class "fa fa-location-dot" ] [] ]
+                , span [] [ text profile.location ]
+                ]
             , div [ class "profile-meta-data" ]
-                  [ div [] [ i [ class "fa fa-link" ] [] ]
-                  , span [] [ text profile.blog ]
-                  ]
+                [ div [] [ i [ class "fa fa-suitcase" ] [] ]
+                , span [] [ text profile.company ]
+                ]
             , div [ class "profile-meta-data" ]
-                  [ div [] [ i [ class "fa fa-at" ] [] ]
-                  , span [] [ text profile.email ]
-                  ]
+                [ div [] [ i [ class "fa fa-link" ] [] ]
+                , span [] [ text profile.blog ]
+                ]
             , div [ class "profile-meta-data" ]
-                  [ div [] [ i [ class "fa fa-brands fa-twitter" ] [] ]
-                  , span [] [ text profile.twitterUsername ]
-                  ]
+                [ div [] [ i [ class "fa fa-at" ] [] ]
+                , span [] [ text profile.email ]
+                ]
+            , div [ class "profile-meta-data" ]
+                [ div [] [ i [ class "fa fa-brands fa-twitter" ] [] ]
+                , span [] [ text profile.twitterUsername ]
+                ]
+            ]
+        ]
+
+
+viewProfileCards : Profile -> Html Msg
+viewProfileCards profile =
+    div [ class "card-container" ]
+        [ div [ class "card" ]
+            [ div [ class "card-label" ] [ text "Number of repos" ]
+            , div [ class "card-stat" ] [ text (String.fromInt profile.repos) ]
+            , div [ class "card-label" ] [ text "Number of gists" ]
+            , div [ class "card-stat" ] [ text (String.fromInt profile.gists) ]
+            ]
+        , div [ class "card" ]
+            [ div [ class "card-label" ] [ text "Followers" ]
+            , div [ class "card-stat" ] [ text (String.fromInt profile.followers) ]
+            , div [ class "card-label" ] [ text "Following" ]
+            , div [ class "card-stat" ] [ text (String.fromInt profile.following) ]
+            ]
+        , div [ class "card" ]
+            [ div [ class "card-label" ] [ text "Account active since" ]
+            , div [ class "card-stat" ] [ text (String.left 10 profile.createdAt) ]
             ]
         ]

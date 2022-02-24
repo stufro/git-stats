@@ -37,10 +37,26 @@ input:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 80%;
+
+  form {
+    width: 100%
+  }
+
+  input {
+    width: 100%;
+  }
+}
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
 }
 
 .profile-summary {
   display: flex;
+  align-self: center;
 }
 
 .profile-avatar {
@@ -53,6 +69,7 @@ input:focus {
 
 .profile-name {
   font-size: xx-large;
+  color: $primary;
 }
 
 .profile-meta-data {
@@ -62,4 +79,55 @@ input:focus {
   div {
     margin-right: 15px;
   }
+}
+
+.card-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: 3rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: $primary;
+  color: $white;
+  width: 15rem;
+  padding: 3rem;
+  border-radius: 2rem;
+  box-shadow: #858585 3px 3px 30px;
+  animation-name: slide-from-bottom;
+  animation-duration: 0.5s;
+  animation-timing-function: linear;
+  animation-iteration-count: 1;
+}
+
+.card-container:nth-child(1) {
+  animation-delay: 0.2ms;
+}
+
+.card-container:nth-child(1) {
+  animation-delay: 0.4ms;
+}
+
+.card-label {
+  margin-bottom: 0.5rem;
+}
+
+.card-stat {
+  margin-bottom: 2rem;
+  font-size: 8ch;
+}
+
+@keyframes slide-from-bottom {
+  from {
+    margin-top: 5rem;
+    opacity: 0.3;
+  }  
+  to {
+    margin-top: 0;
+    opacity: 1;
+  }  
 }
