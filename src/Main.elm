@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Browser exposing (element)
 import Html exposing (..)
-import Html.Attributes exposing (class, id, value, src)
+import Html.Attributes exposing (class, id, src, value)
 import Html.Events exposing (onInput, onSubmit)
 import Http exposing (request)
 import Json.Decode exposing (Decoder, int, string, succeed)
@@ -65,7 +65,24 @@ initialModel =
     { githubPass = ""
     , searchText = ""
     , error = Nothing
-    , profile = Nothing
+    , profile =
+        Just
+            { avatarUrl = "https://avatars.githubusercontent.com/u/2918581?v=4"
+            , bio = "Source code and more for the most popular front-end framework in the world."
+            , blog = "https://getbootstrap.com"
+            , company = ""
+            , createdAt = "2012-11-29T05:47:03Z"
+            , email = ""
+            , followers = 0
+            , following = 0
+            , gists = 0
+            , location = "San Francisco"
+            , name = "Bootstrap"
+            , repos = 24
+            , twitterUsername = "getbootstrap"
+            , url = "https://api.github.com/users/twbs"
+            , username = "twbs"
+            }
     }
 
 
@@ -147,44 +164,60 @@ profileDecoder =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ h1 [] [ text "Git Stats" ]
-        , form [ onSubmit Search ]
-            [ input
-                [ onInput UpdateSearchBox
-                , value model.searchText
+    div [ class "content" ]
+        [ div [ class "header" ]
+            [ h1 [] [ text "Git Stats" ]
+            , form [ onSubmit Search ]
+                [ input
+                    [ onInput UpdateSearchBox
+                    , value model.searchText
+                    ]
+                    []
                 ]
-                []
             ]
         , viewProfile model.profile
         ]
+
 
 viewProfile : Maybe Profile -> Html Msg
 viewProfile maybeProfile =
     case maybeProfile of
         Just profile ->
-          div []
-            [ viewProfileSummary profile
-            ]
+            div []
+                [ viewProfileSummary profile
+                ]
+
         Nothing ->
-          div [] []
+            div [] []
+
 
 viewProfileSummary : Profile -> Html Msg
 viewProfileSummary profile =
     div
-      [ class "profile-summary" ]
-      [
-        div
-          [ class "profile-avatar" ]
-          [ img [ src profile.avatarUrl ] [] ]
-      , div
-          [ class "profile-details" ]
-          [ div [ class "profile-name" ] [ text profile.username ]
-          , div [ class "profile-meta-data" ] [ text profile.name ]
-          , div [ class "profile-meta-data" ] [ text profile.location ]
-          , div [ class "profile-meta-data" ] [ text profile.company ]
-          , div [ class "profile-meta-data" ] [ text profile.blog ]
-          , div [ class "profile-meta-data" ] [ text profile.email ]
-          , div [ class "profile-meta-data" ] [ text profile.twitterUsername ]
-          ]
-      ]
+        [ class "profile-summary" ]
+        [ div
+            [ class "profile-avatar" ]
+            [ img [ src profile.avatarUrl ] [] ]
+        , div
+            [ class "profile-details" ]
+            [ div [ class "profile-name" ] [ text profile.username ]
+            , div [ class "profile-meta-data" ]
+                  [ i [ class "fa fa-user" ] []
+                  , text profile.name ]
+            , div [ class "profile-meta-data" ] 
+                  [ i [ class "fa fa-location-dot" ] []
+                  , text profile.location ]
+            , div [ class "profile-meta-data" ]
+                  [ i [ class "fa fa-suitcase" ] []
+                  , text profile.company ]
+            , div [ class "profile-meta-data" ]
+                  [ i [ class "fa fa-link" ] []
+                  , text profile.blog ]
+            , div [ class "profile-meta-data" ]
+                  [ i [ class "fa fa-at" ] []
+                  , text profile.email ]
+            , div [ class "profile-meta-data" ]
+                  [ i [ class "fa fa-brands fa-twitter" ] []
+                  , text profile.twitterUsername ]
+            ]
+        ]
