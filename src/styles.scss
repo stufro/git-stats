@@ -1,7 +1,6 @@
-$background: #EFE6DD;
-$primary: #0197F6;
-$secondary: #2E4057;
-$contrast: #6A8E7F;
+$background: #F2EDEB;
+$primary: #F05365;
+$secondary: #858585;
 $white: #FFFFFF;
 
 body {
@@ -10,7 +9,7 @@ body {
 }
 
 h1 {
-  color: $contrast;
+  color: $primary;
 }
 
 input {
@@ -25,7 +24,7 @@ input {
 
 input:focus {
   outline: none;
-  box-shadow: inset $secondary 0 0 0 1px;
+  box-shadow: inset $primary 0 0 0 1px;
 }
 
 .content {
@@ -58,5 +57,9 @@ input:focus {
 
 .profile-meta-data {
   display: flex;
-  color: $primary;
+  color: $secondary;
+
+  div {
+    margin-right: 15px;
+  }
 }
