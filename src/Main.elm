@@ -106,7 +106,7 @@ update msg model =
             )
 
         Search ->
-            ( { model | searchText = "" }
+            ( { model | searchText = "", profile = Nothing }
             , fetchProfile model.searchText model.githubPass
             )
 
@@ -236,19 +236,22 @@ viewProfileCards : Profile -> Html Msg
 viewProfileCards profile =
     div [ class "card-container" ]
         [ div [ class "card" ]
-            [ div [ class "card-label" ] [ text "Number of repos" ]
+            [ span [ class "fa fa-code card-icon" ] []
+            , div [ class "card-label" ] [ text "Number of repos" ]
             , div [ class "card-stat" ] [ text (String.fromInt profile.repos) ]
             , div [ class "card-label" ] [ text "Number of gists" ]
             , div [ class "card-stat" ] [ text (String.fromInt profile.gists) ]
             ]
         , div [ class "card" ]
-            [ div [ class "card-label" ] [ text "Followers" ]
+            [ span [ class "fa fa-user-group card-icon" ] []
+            , div [ class "card-label" ] [ text "Followers" ]
             , div [ class "card-stat" ] [ text (String.fromInt profile.followers) ]
             , div [ class "card-label" ] [ text "Following" ]
             , div [ class "card-stat" ] [ text (String.fromInt profile.following) ]
             ]
         , div [ class "card" ]
-            [ div [ class "card-label" ] [ text "Account active since" ]
+            [ span [ class "fa fa-clock card-icon" ] []
+            , div [ class "card-label" ] [ text "Account active since" ]
             , div [ class "card-stat" ] [ text (String.left 10 profile.createdAt) ]
             ]
         ]
