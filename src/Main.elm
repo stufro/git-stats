@@ -7,6 +7,7 @@ import Html.Events exposing (onInput, onSubmit)
 import Http
 import Json.Decode exposing (Decoder, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (optional, required)
+import RepoStats exposing (totalStars)
 
 
 main : Program String Model Msg
@@ -118,7 +119,7 @@ update msg model =
             )
 
         Search ->
-            ( { model | searchText = "", profile = Nothing }
+            ( { model | searchText = "", profile = Nothing, repos = Nothing }
             , Cmd.batch
                 [ fetchProfile model.searchText model.githubPass
                 , fetchRepos model.searchText model.githubPass
@@ -226,20 +227,20 @@ view model =
                     []
                 ]
             ]
-        , viewProfile model.profile
+        , viewProfile model.profile model.repos
         ]
 
 
-viewProfile : Maybe Profile -> Html Msg
-viewProfile maybeProfile =
-    case maybeProfile of
-        Just profile ->
+viewProfile : Maybe Profile -> Maybe (List Repo) -> Html Msg
+viewProfile maybeProfile maybeRepos =
+    case ( maybeProfile, maybeRepos ) of
+        ( Just profile, Just repos ) ->
             div [ class "profile" ]
                 [ viewProfileSummary profile
-                , viewProfileCards profile
+                , viewProfileCards profile repos
                 ]
 
-        Nothing ->
+        (_, _) ->
             div [] []
 
 
@@ -281,17 +282,17 @@ viewProfileSummary profile =
         ]
 
 
-viewProfileCards : Profile -> Html Msg
-viewProfileCards profile =
+viewProfileCards : Profile -> List Repo -> Html Msg
+viewProfileCards profile repos =
     div [ class "card-container" ]
-        [ viewReposCard profile
-        , viewFollowersCard profile
+        [ viewReposCard profile repos
+        , viewFollowersCard profile repos
         , viewCreatedCard profile
         ]
 
 
-viewReposCard : Profile -> Html Msg
-viewReposCard profile =
+viewReposCard : Profile -> List Repo -> Html Msg
+viewReposCard profile repos =
     div [ class "card" ]
         [ div [ class "card-body" ]
             [ div [ class "card-front" ]
@@ -311,8 +312,8 @@ viewReposCard profile =
             ]
         ]
 
-viewFollowersCard : Profile -> Html Msg
-viewFollowersCard profile =
+viewFollowersCard : Profile -> List Repo -> Html Msg
+viewFollowersCard profile repos =
     div [ class "card" ]
         [ div [ class "card-body" ]
             [ div [ class "card-front" ]
@@ -325,7 +326,7 @@ viewFollowersCard profile =
             , div [ class "card-back" ]
                 [ span [ class "fa fa-star card-icon" ] []
                 , div [ class "card-label" ] [ text "Repo Stars" ]
-                , div [ class "card-stat" ] [ text "TODO" ]
+                , div [ class "card-stat" ] [ text (RepoStats.totalStars repos) ]
                 , div [ class "card-label" ] [ text "Repo Forks" ]
                 , div [ class "card-stat" ] [ text "TODO" ]
                 ]
