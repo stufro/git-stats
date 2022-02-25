@@ -172,7 +172,7 @@ view model =
                 [ input
                     [ onInput UpdateSearchBox
                     , value model.searchText
-                    , placeholder "Enter GitHub Username"
+                    , placeholder "Enter GitHub Username:"
                     ]
                     []
                 ]

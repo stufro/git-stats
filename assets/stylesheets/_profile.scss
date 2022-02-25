@@ -7,9 +7,9 @@
 .profile-summary {
   display: flex;
   align-self: center;
-  opacity: .3;
+  opacity: 0;
   animation-name: fade-in;
-  animation-duration: 1s;
+  animation-duration: 3s;
   animation-fill-mode: forwards;
 }
 

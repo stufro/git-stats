@@ -14,12 +14,26 @@ input {
   border-radius: 4rem;
   margin-bottom: 1rem;
   text-align: center;
-  transition: box-shadow 0.5s ease-in-out;
+  transition: box-shadow 0.5s ease-in-out,
+              background-color 0.5s ease-in-out;
 }
 
 input:focus {
   outline: none;
   box-shadow: inset $primary 0 0 0 1px;
+
+}
+
+input::placeholder {
+  font-size: 2vw;
+  text-align: center;
+  transition: font-size 0.5s ease-in-out,
+              margin-right 0.5s ease-in-out;
+}
+
+input:focus::placeholder {
+  font-size: 1.5vw;
+  margin-right: 20vw;
 }
 
 .content {
