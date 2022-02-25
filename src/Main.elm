@@ -1,11 +1,11 @@
 module Main exposing (..)
 
-import Browser exposing (element)
+import Browser
 import Html exposing (..)
-import Html.Attributes exposing (class, id, src, value)
+import Html.Attributes exposing (class, src, value)
 import Html.Events exposing (onInput, onSubmit)
-import Http exposing (request)
-import Json.Decode exposing (Decoder, int, string, succeed)
+import Http
+import Json.Decode exposing (Decoder, int, string, list, succeed)
 import Json.Decode.Pipeline exposing (optional, required)
 import Html.Attributes exposing (placeholder)
 
@@ -39,6 +39,7 @@ type alias Model =
     , searchText : String
     , error : Maybe Http.Error
     , profile : Maybe Profile
+    , repos : Maybe (List Repo)
     }
 
 
@@ -58,6 +59,15 @@ type alias Profile =
     , followers : Int
     , following : Int
     , createdAt : String
+    }
+
+type alias Repo =
+    { name : String
+    , description : String
+    , language : String
+    , starCount : Int
+    , forksCount : Int
+    , openIssuesCount : Int
     }
 
 
@@ -84,6 +94,7 @@ initialModel =
             , url = "https://api.github.com/users/twbs"
             , username = "twbs"
             }
+    , repos = Just []
     }
 
 
@@ -95,6 +106,7 @@ type Msg
     = UpdateSearchBox String
     | Search
     | LoadProfile (Result Http.Error Profile)
+    | LoadRepos (Result Http.Error (List Repo))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -107,7 +119,9 @@ update msg model =
 
         Search ->
             ( { model | searchText = "", profile = Nothing }
-            , fetchProfile model.searchText model.githubPass
+            , Cmd.batch [ fetchProfile model.searchText model.githubPass
+                        , fetchRepos model.searchText model.githubPass
+                        ]
             )
 
         LoadProfile (Ok profile) ->
@@ -119,7 +133,16 @@ update msg model =
             ( { model | error = Just error }
             , Cmd.none
             )
+            
+        LoadRepos (Ok repos) ->
+            ( { model | repos = Just repos }
+            , Cmd.none
+            )
 
+        LoadRepos (Err error) ->
+            ( { model | error = Just error }
+            , Cmd.none
+            )
 
 fetchProfile : String -> String -> Cmd Msg
 fetchProfile usernameSearch githubPass =
@@ -129,6 +152,18 @@ fetchProfile usernameSearch githubPass =
         , url = "https://api.github.com/users/" ++ usernameSearch
         , body = Http.emptyBody
         , expect = Http.expectJson LoadProfile profileDecoder
+        , timeout = Nothing
+        , tracker = Nothing
+        }
+
+fetchRepos : String -> String -> Cmd Msg
+fetchRepos usernameSearch githubPass =
+    Http.request
+        { method = "GET"
+        , headers = [ authorisationHeader githubPass ]
+        , url = "https://api.github.com/users/" ++ usernameSearch ++ "/repos"
+        , body = Http.emptyBody
+        , expect = Http.expectJson LoadRepos (list repoDecoder)
         , timeout = Nothing
         , tracker = Nothing
         }
@@ -158,6 +193,15 @@ profileDecoder =
         |> required "following" int
         |> required "created_at" string
 
+repoDecoder : Decoder Repo
+repoDecoder =
+    succeed Repo
+        |> required "name" string
+        |> optional "description" string ""
+        |> optional "language" string ""
+        |> required "stargazers_count" int
+        |> required "forks" int
+        |> required "open_issues_count" int
 
 
 -- VIEW

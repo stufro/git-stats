@@ -1,0 +1,6 @@
+- [x] Fetch repo data for user
+- [ ] Make flipable cards
+- [ ] Add loading spinner
+- [ ] Make profile data clickable
+- [ ] Recent searches
+- [ ] Handle API errors
