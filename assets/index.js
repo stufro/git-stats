@@ -1,5 +1,5 @@
-import { Elm } from './Main.elm'
-import './styles.scss'
+import { Elm } from '/src/Main.elm'
+import './stylesheets/main.scss'
 import '@fortawesome/fontawesome-free/js/fontawesome'
 import '@fortawesome/fontawesome-free/js/solid'
 import '@fortawesome/fontawesome-free/js/regular'

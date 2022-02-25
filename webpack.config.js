@@ -5,7 +5,7 @@ const Dotenv = require('dotenv-webpack');
 module.exports = {
   entry: {
     app: [
-      './src/index.js'
+      './assets/index.js'
     ]
   },
 
