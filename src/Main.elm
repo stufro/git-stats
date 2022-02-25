@@ -2,12 +2,11 @@ module Main exposing (..)
 
 import Browser
 import Html exposing (..)
-import Html.Attributes exposing (class, src, value)
+import Html.Attributes exposing (class, placeholder, src, value)
 import Html.Events exposing (onInput, onSubmit)
 import Http
-import Json.Decode exposing (Decoder, int, string, list, succeed)
+import Json.Decode exposing (Decoder, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (optional, required)
-import Html.Attributes exposing (placeholder)
 
 
 main : Program String Model Msg
@@ -60,6 +59,7 @@ type alias Profile =
     , following : Int
     , createdAt : String
     }
+
 
 type alias Repo =
     { name : String
@@ -119,9 +119,10 @@ update msg model =
 
         Search ->
             ( { model | searchText = "", profile = Nothing }
-            , Cmd.batch [ fetchProfile model.searchText model.githubPass
-                        , fetchRepos model.searchText model.githubPass
-                        ]
+            , Cmd.batch
+                [ fetchProfile model.searchText model.githubPass
+                , fetchRepos model.searchText model.githubPass
+                ]
             )
 
         LoadProfile (Ok profile) ->
@@ -133,7 +134,7 @@ update msg model =
             ( { model | error = Just error }
             , Cmd.none
             )
-            
+
         LoadRepos (Ok repos) ->
             ( { model | repos = Just repos }
             , Cmd.none
@@ -143,6 +144,7 @@ update msg model =
             ( { model | error = Just error }
             , Cmd.none
             )
+
 
 fetchProfile : String -> String -> Cmd Msg
 fetchProfile usernameSearch githubPass =
@@ -155,6 +157,7 @@ fetchProfile usernameSearch githubPass =
         , timeout = Nothing
         , tracker = Nothing
         }
+
 
 fetchRepos : String -> String -> Cmd Msg
 fetchRepos usernameSearch githubPass =
@@ -193,6 +196,7 @@ profileDecoder =
         |> required "following" int
         |> required "created_at" string
 
+
 repoDecoder : Decoder Repo
 repoDecoder =
     succeed Repo
@@ -202,6 +206,7 @@ repoDecoder =
         |> required "stargazers_count" int
         |> required "forks" int
         |> required "open_issues_count" int
+
 
 
 -- VIEW
@@ -279,23 +284,72 @@ viewProfileSummary profile =
 viewProfileCards : Profile -> Html Msg
 viewProfileCards profile =
     div [ class "card-container" ]
-        [ div [ class "card" ]
-            [ span [ class "fa fa-code card-icon" ] []
-            , div [ class "card-label" ] [ text "Number of repos" ]
-            , div [ class "card-stat" ] [ text (String.fromInt profile.repos) ]
-            , div [ class "card-label" ] [ text "Number of gists" ]
-            , div [ class "card-stat" ] [ text (String.fromInt profile.gists) ]
-            ]
-        , div [ class "card" ]
-            [ span [ class "fa fa-user-group card-icon" ] []
-            , div [ class "card-label" ] [ text "Followers" ]
-            , div [ class "card-stat" ] [ text (String.fromInt profile.followers) ]
-            , div [ class "card-label" ] [ text "Following" ]
-            , div [ class "card-stat" ] [ text (String.fromInt profile.following) ]
-            ]
-        , div [ class "card" ]
-            [ span [ class "fa fa-clock card-icon" ] []
-            , div [ class "card-label" ] [ text "Account active since" ]
-            , div [ class "card-stat" ] [ text (String.left 10 profile.createdAt) ]
+        [ viewReposCard profile
+        , viewFollowersCard profile
+        , viewCreatedCard profile
+        ]
+
+
+viewReposCard : Profile -> Html Msg
+viewReposCard profile =
+    div [ class "card" ]
+        [ div [ class "card-body" ]
+            [ div [ class "card-front" ]
+                [ span [ class "fa fa-code card-icon" ] []
+                , div [ class "card-label" ] [ text "Number of repos" ]
+                , div [ class "card-stat" ] [ text (String.fromInt profile.repos) ]
+                , div [ class "card-label" ] [ text "Number of gists" ]
+                , div [ class "card-stat" ] [ text (String.fromInt profile.gists) ]
+                ]
+            , div [ class "card-back" ]
+                [ span [ class "fa fa-code card-icon" ] []
+                , div [ class "card-label" ] [ text "Most used language" ]
+                , div [ class "card-stat" ] [ text "TODO" ]
+                , div [ class "card-label" ] [ text "Number of {{lang}} repos" ]
+                , div [ class "card-stat" ] [ text "TODO" ]
+                ]
             ]
         ]
+
+viewFollowersCard : Profile -> Html Msg
+viewFollowersCard profile =
+    div [ class "card" ]
+        [ div [ class "card-body" ]
+            [ div [ class "card-front" ]
+                [ span [ class "fa fa-user-group card-icon" ] []
+                , div [ class "card-label" ] [ text "Followers" ]
+                , div [ class "card-stat" ] [ text (String.fromInt profile.followers) ]
+                , div [ class "card-label" ] [ text "Following" ]
+                , div [ class "card-stat" ] [ text (String.fromInt profile.following) ]
+                ]
+            , div [ class "card-back" ]
+                [ span [ class "fa fa-user-group card-icon" ] []
+                , div [ class "card-label" ] [ text "Something else" ]
+                , div [ class "card-stat" ] [ text "TODO" ]
+                , div [ class "card-label" ] [ text "Another thing" ]
+                , div [ class "card-stat" ] [ text "TODO" ]
+                ]
+            ]
+        ]
+
+viewCreatedCard : Profile -> Html Msg
+viewCreatedCard profile =
+    div [ class "card" ]
+        [ div [ class "card-body" ]
+            [ div [ class "card-front" ]
+                [ span [ class "fa fa-clock card-icon" ] []
+                , div [ class "card-label" ] [ text "Account active since" ]
+                , div [ class "card-stat" ] [ text (String.left 7 profile.createdAt) ]
+                ]
+            , div [ class "card-back" ]
+                [ span [ class "fa fa-clock card-icon" ] []
+                , div [ class "card-label" ] [ text "Something else" ]
+                , div [ class "card-stat" ] [ text "TODO" ]
+                , div [ class "card-label" ] [ text "Another thing" ]
+                , div [ class "card-stat" ] [ text "TODO" ]
+                ]
+            ]
+        ]
+        
+
+        

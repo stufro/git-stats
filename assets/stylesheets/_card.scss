@@ -6,17 +6,42 @@
 }
 
 .card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  opacity: 0;
+  animation: fade-in 0.5s forwards;
+  perspective: 40rem;
+}
+
+.card-body {
   background-color: $primary;
   color: white;
+  height: 22rem;
   width: 15rem;
   padding: 1.5rem 3rem 3rem 3rem;
   border-radius: 2rem;
   box-shadow: #858585 3px 3px 30px;
-  opacity: 0;
-  animation: fade-in 0.5s forwards;
+  transform-style: preserve-3d;
+  transition: .5s transform;
+  
+  .card:hover & {
+    transform: rotateX(-180deg);
+  }  
+}
+
+.card-front, .card-back {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  backface-visibility: hidden;
+}
+
+.card-back { 
+  background-color: white;
+  color: $primary;
+  position: absolute;
+  padding-top: 1.5rem;
+  border-radius: 2rem;
+  top: 0; right: 0; bottom: 0; left: 0;
+  transform: rotateX(-180deg);
 }
 
 .card-container .card:nth-child(1) {
