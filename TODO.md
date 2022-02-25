@@ -4,3 +4,5 @@
 - [ ] Make profile data clickable
 - [ ] Recent searches
 - [ ] Handle API errors
+- [ ] Improve tesst, building example records
+- [ ] Remove duplicate type alias in RepoStats
