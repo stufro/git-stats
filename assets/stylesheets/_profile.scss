@@ -1,0 +1,36 @@
+.profile {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+}
+
+.profile-summary {
+  display: flex;
+  align-self: center;
+  opacity: .3;
+  animation-name: fade-in;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+}
+
+.profile-avatar {
+  img {
+    border-radius: 15rem;
+    width: 10rem;
+    margin-right: 3rem;
+  }
+}
+
+.profile-name {
+  font-size: xx-large;
+  color: $primary;
+}
+
+.profile-meta-data {
+  display: flex;
+  color: $secondary;
+
+  div {
+    margin-right: 15px;
+  }
+}
