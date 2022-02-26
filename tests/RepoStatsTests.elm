@@ -11,6 +11,7 @@ suite =
         [ totalStars
         , totalForks
         , mostUsedLanguage
+        , mostUsedLanguageCount
         ]
 
 
@@ -54,5 +55,19 @@ mostUsedLanguage =
                   repos
                     |> RepoStats.mostUsedLanguage
                     |> Expect.equal "Ruby"
+        ]
+
+mostUsedLanguageCount : Test
+mostUsedLanguageCount =
+    describe "mostUsedLanguageCount"
+        [ test "returns the number of times the most used language language appears in the repos" <|
+            \() ->
+              let
+                repos =
+                  [ ( Repo "" "" "Ruby" 0 0 0), ( Repo "" "" "Ruby" 0 0 0 ), ( Repo "" "" "Elm" 0 0 0 ) ]
+              in
+                  repos
+                    |> RepoStats.mostUsedLanguageCount
+                    |> Expect.equal "2"
         ]
 

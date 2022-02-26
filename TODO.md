@@ -1,8 +1,9 @@
 - [x] Fetch repo data for user
-- [ ] Make flipable cards
+- [x] Make flipable cards
+- [x] Add most used language
 - [ ] Add loading spinner
 - [ ] Make profile data clickable
 - [ ] Recent searches
 - [ ] Handle API errors
-- [ ] Improve tesst, building example records
+- [ ] Improve tests, building example records
 - [ ] Remove duplicate type alias in RepoStats

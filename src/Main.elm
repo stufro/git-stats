@@ -8,6 +8,7 @@ import Http
 import Json.Decode exposing (Decoder, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (optional, required)
 import RepoStats exposing (totalStars)
+import RepoStats exposing (mostUsedLanguageCount)
 
 
 main : Program String Model Msg
@@ -293,6 +294,13 @@ viewProfileCards profile repos =
 
 viewReposCard : Profile -> List Repo -> Html Msg
 viewReposCard profile repos =
+    let
+        mostUsedLanguage =
+            RepoStats.mostUsedLanguage repos
+        mostUsedLanguageCount =
+            RepoStats.mostUsedLanguageCount repos
+    in
+    
     div [ class "card" ]
         [ div [ class "card-body" ]
             [ div [ class "card-front" ]
@@ -305,9 +313,9 @@ viewReposCard profile repos =
             , div [ class "card-back" ]
                 [ span [ class "fa fa-language card-icon" ] []
                 , div [ class "card-label" ] [ text "Most used language" ]
-                , div [ class "card-stat" ] [ text (RepoStats.mostUsedLanguage repos) ]
-                , div [ class "card-label" ] [ text "Number of {{lang}} repos" ]
-                , div [ class "card-stat" ] [ text "TODO" ]
+                , div [ class "card-stat" ] [ text mostUsedLanguage ]
+                , div [ class "card-label" ] [ text ("Number of " ++ mostUsedLanguage ++ " repos") ]
+                , div [ class "card-stat" ] [ text mostUsedLanguageCount ]
                 ]
             ]
         ]
