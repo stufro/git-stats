@@ -38,6 +38,7 @@ type alias Model =
     { githubPass : String
     , searchText : String
     , error : Maybe Http.Error
+    , loading : Bool
     , profile : Maybe Profile
     , repos : Maybe (List Repo)
     }
@@ -77,6 +78,7 @@ initialModel =
     { githubPass = ""
     , searchText = ""
     , error = Nothing
+    , loading = False
     , profile =
         Just
             { avatarUrl = "https://avatars.githubusercontent.com/u/2918581?v=4"
@@ -119,7 +121,7 @@ update msg model =
             )
 
         Search ->
-            ( { model | searchText = "", profile = Nothing, repos = Nothing }
+            ( { model | searchText = "", profile = Nothing, repos = Nothing, loading = True }
             , Cmd.batch
                 [ fetchProfile model.searchText model.githubPass
                 , fetchRepos model.searchText model.githubPass
@@ -127,22 +129,22 @@ update msg model =
             )
 
         LoadProfile (Ok profile) ->
-            ( { model | profile = Just profile }
+            ( { model | profile = Just profile, loading = False }
             , Cmd.none
             )
 
         LoadProfile (Err error) ->
-            ( { model | error = Just error }
+            ( { model | error = Just error, loading = False }
             , Cmd.none
             )
 
         LoadRepos (Ok repos) ->
-            ( { model | repos = Just repos }
+            ( { model | repos = Just repos, loading = False }
             , Cmd.none
             )
 
         LoadRepos (Err error) ->
-            ( { model | error = Just error }
+            ( { model | error = Just error, loading = False }
             , Cmd.none
             )
 
@@ -227,9 +229,16 @@ view model =
                     []
                 ]
             ]
-        , viewProfile model.profile model.repos
+        , viewMainContent model
         ]
 
+viewMainContent : Model -> Html Msg
+viewMainContent model =
+    case model.loading of
+        True ->
+            div [ class "loading-spinner" ] []
+        False ->
+            viewProfile model.profile model.repos
 
 viewProfile : Maybe Profile -> Maybe (List Repo) -> Html Msg
 viewProfile maybeProfile maybeRepos =
