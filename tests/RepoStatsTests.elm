@@ -11,7 +11,6 @@ suite =
         [ totalStars
         , totalForks
         , mostUsedLanguage
-        , mostUsedLanguageCount
         ]
 
 
@@ -46,7 +45,7 @@ totalForks =
 mostUsedLanguage : Test
 mostUsedLanguage =
     describe "mostUsedLanguage"
-        [ test "returns the language that appears most often in the repos" <|
+        [ test "returns a tuple of the most used language and how many times it's used" <|
             \() ->
               let
                 repos =
@@ -54,20 +53,23 @@ mostUsedLanguage =
               in
                   repos
                     |> RepoStats.mostUsedLanguage
-                    |> Expect.equal "Ruby"
-        ]
-
-mostUsedLanguageCount : Test
-mostUsedLanguageCount =
-    describe "mostUsedLanguageCount"
-        [ test "returns the number of times the most used language language appears in the repos" <|
+                    |> Expect.equal ( "Ruby", 2 )
+        , test "ignores empty string languages" <|
             \() ->
               let
                 repos =
-                  [ ( Repo "" "" "Ruby" 0 0 0), ( Repo "" "" "Ruby" 0 0 0 ), ( Repo "" "" "Elm" 0 0 0 ) ]
+                  [ ( Repo "" "" "" 0 0 0), ( Repo "" "" "" 0 0 0 ), ( Repo "" "" "Elm" 0 0 0 ) ]
               in
                   repos
-                    |> RepoStats.mostUsedLanguageCount
-                    |> Expect.equal "2"
+                    |> RepoStats.mostUsedLanguage
+                    |> Expect.equal ( "Elm", 1 )
+        , test "handles an empty list of repos" <|
+            \() ->
+              let
+                repos =
+                  [ ]
+              in
+                  repos
+                    |> RepoStats.mostUsedLanguage
+                    |> Expect.equal ( "", 0 )
         ]
-

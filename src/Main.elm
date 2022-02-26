@@ -7,8 +7,7 @@ import Html.Events exposing (onInput, onSubmit)
 import Http
 import Json.Decode exposing (Decoder, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (optional, required)
-import RepoStats exposing (totalStars)
-import RepoStats exposing (mostUsedLanguageCount)
+import RepoStats exposing (mostUsedLanguage, totalForks, totalStars)
 
 
 main : Program String Model Msg
@@ -166,7 +165,7 @@ fetchRepos usernameSearch githubPass =
     Http.request
         { method = "GET"
         , headers = [ authorisationHeader githubPass ]
-        , url = "https://api.github.com/users/" ++ usernameSearch ++ "/repos"
+        , url = "https://api.github.com/users/" ++ usernameSearch ++ "/repos?per_page=100"
         , body = Http.emptyBody
         , expect = Http.expectJson LoadRepos (list repoDecoder)
         , timeout = Nothing
@@ -241,7 +240,7 @@ viewProfile maybeProfile maybeRepos =
                 , viewProfileCards profile repos
                 ]
 
-        (_, _) ->
+        ( _, _ ) ->
             div [] []
 
 
@@ -295,12 +294,15 @@ viewProfileCards profile repos =
 viewReposCard : Profile -> List Repo -> Html Msg
 viewReposCard profile repos =
     let
-        mostUsedLanguage =
+        mostUsedLanguageTuple =
             RepoStats.mostUsedLanguage repos
+
+        mostUsedLanguage =
+            Tuple.first mostUsedLanguageTuple
+
         mostUsedLanguageCount =
-            RepoStats.mostUsedLanguageCount repos
+            Tuple.second mostUsedLanguageTuple
     in
-    
     div [ class "card" ]
         [ div [ class "card-body" ]
             [ div [ class "card-front" ]
@@ -315,10 +317,11 @@ viewReposCard profile repos =
                 , div [ class "card-label" ] [ text "Most used language" ]
                 , div [ class "card-stat" ] [ text mostUsedLanguage ]
                 , div [ class "card-label" ] [ text ("Number of " ++ mostUsedLanguage ++ " repos") ]
-                , div [ class "card-stat" ] [ text mostUsedLanguageCount ]
+                , div [ class "card-stat" ] [ text (String.fromInt mostUsedLanguageCount) ]
                 ]
             ]
         ]
+
 
 viewFollowersCard : Profile -> List Repo -> Html Msg
 viewFollowersCard profile repos =
@@ -341,6 +344,7 @@ viewFollowersCard profile repos =
             ]
         ]
 
+
 viewCreatedCard : Profile -> Html Msg
 viewCreatedCard profile =
     div [ class "card" ]
@@ -359,6 +363,3 @@ viewCreatedCard profile =
                 ]
             ]
         ]
-        
-
-        

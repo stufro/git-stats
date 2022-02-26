@@ -5,5 +5,6 @@
 - [ ] Make profile data clickable
 - [ ] Recent searches
 - [ ] Handle API errors
+- [ ] Handle pagination in repos API
 - [ ] Improve tests, building example records
 - [ ] Remove duplicate type alias in RepoStats
