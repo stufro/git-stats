@@ -1,3 +1,14 @@
 .loading-spinner {
-  background-color: black;
+  width: 15rem;
+  height: 15rem;
+  border-radius: 100%;
+  border: 15px white solid;
+  border-top-color: $primary;
+  animation: spin 2s infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  } 
 }

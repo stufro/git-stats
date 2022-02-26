@@ -1,7 +1,7 @@
 - [x] Fetch repo data for user
 - [x] Make flipable cards
 - [x] Add most used language
-- [ ] Add loading spinner
+- [x] Add loading spinner
 - [ ] Make profile data clickable
 - [ ] Recent searches
 - [ ] Handle API errors
