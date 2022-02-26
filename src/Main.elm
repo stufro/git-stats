@@ -79,24 +79,8 @@ initialModel =
     , searchText = ""
     , error = Nothing
     , loading = False
-    , profile =
-        Just
-            { avatarUrl = "https://avatars.githubusercontent.com/u/2918581?v=4"
-            , bio = "Source code and more for the most popular front-end framework in the world."
-            , blog = "https://getbootstrap.com"
-            , company = ""
-            , createdAt = "2012-11-29T05:47:03Z"
-            , email = ""
-            , followers = 0
-            , following = 0
-            , gists = 0
-            , location = "San Francisco"
-            , name = "Bootstrap"
-            , repos = 24
-            , twitterUsername = "getbootstrap"
-            , url = "https://api.github.com/users/twbs"
-            , username = "twbs"
-            }
+    -- , profile = Just { avatarUrl = "https://avatars.githubusercontent.com/u/2918581?v=4" , bio = "Source code and more for the most popular front-end framework in the world." , blog = "https://getbootstrap.com" , company = "" , createdAt = "2012-11-29T05:47:03Z" , email = "" , followers = 0 , following = 0 , gists = 0 , location = "San Francisco" , name = "Bootstrap" , repos = 24 , twitterUsername = "getbootstrap" , url = "https://api.github.com/users/twbs" , username = "twbs" }
+    , profile = Nothing
     , repos = Just []
     }
 
@@ -121,7 +105,7 @@ update msg model =
             )
 
         Search ->
-            ( { model | searchText = "", profile = Nothing, repos = Nothing, loading = True }
+            ( { model | searchText = "", profile = Nothing, repos = Nothing, error = Nothing, loading = True }
             , Cmd.batch
                 [ fetchProfile model.searchText model.githubPass
                 , fetchRepos model.searchText model.githubPass
@@ -186,7 +170,7 @@ profileDecoder =
         |> required "login" string
         |> required "avatar_url" string
         |> required "url" string
-        |> required "name" string
+        |> optional "name" string ""
         |> optional "company" string ""
         |> optional "blog" string ""
         |> optional "location" string ""
@@ -210,6 +194,23 @@ repoDecoder =
         |> required "forks" int
         |> required "open_issues_count" int
 
+errorToString : Http.Error -> String
+errorToString error =
+    case error of
+        Http.BadUrl url ->
+            "The URL " ++ url ++ " was invalid"
+        Http.Timeout ->
+            "Unable to reach the server, timed out"
+        Http.NetworkError ->
+            "Unable to reach the server, check your network connection"
+        Http.BadStatus 500 ->
+            "The server had a problem, try again later"
+        Http.BadStatus 404 ->
+            "Unable to find GitHub profile"
+        Http.BadStatus _ ->
+            "Unknown error"
+        Http.BadBody errorMessage ->
+            errorMessage
 
 
 -- VIEW
@@ -234,11 +235,17 @@ view model =
 
 viewMainContent : Model -> Html Msg
 viewMainContent model =
-    case model.loading of
-        True ->
-            div [ class "loading-spinner" ] []
-        False ->
-            viewProfile model.profile model.repos
+    if model.loading then
+        div [ class "loading-spinner" ] []
+    else
+        case model.error of
+            Just error ->
+                div [ class "error-toast" ]
+                    [ span [] [ text "An error occurred: "] 
+                    , span [] [ text (errorToString error) ]
+                    ]
+            Nothing ->
+                viewProfile model.profile model.repos
 
 viewProfile : Maybe Profile -> Maybe (List Repo) -> Html Msg
 viewProfile maybeProfile maybeRepos =

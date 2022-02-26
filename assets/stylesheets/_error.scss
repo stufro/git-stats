@@ -1,0 +1,16 @@
+.error-toast {
+  background-color: $primary;
+  color: white;
+  border-radius: .5rem;
+  padding: 1rem;
+  width: 50%;
+
+  animation: slide-in 1s forwards;
+  margin-right: 20rem;
+}
+
+@keyframes slide-in {
+  100% {
+    margin-right: 0;
+  }  
+}
