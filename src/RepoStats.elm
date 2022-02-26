@@ -17,7 +17,7 @@ type alias Repo =
 totalStars : List Repo -> String
 totalStars repos =
     repos
-        |> List.map (\repo -> repo.starCount)
+        |> List.map .starCount
         |> List.foldr (+) 0
         |> String.fromInt
 
@@ -25,7 +25,7 @@ totalStars repos =
 totalForks : List Repo -> String
 totalForks repos =
     repos
-        |> List.map (\repo -> repo.forksCount)
+        |> List.map .forksCount
         |> List.foldr (+) 0
         |> String.fromInt
 
