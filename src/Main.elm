@@ -74,8 +74,8 @@ type alias Repo =
     }
 
 type alias Activity =
-    { activity_type : String
-    , created_at : String
+    { activityType : String
+    , createdAt : String
     }
 
 
@@ -293,19 +293,19 @@ viewMainContent model =
                     ]
 
             Nothing ->
-                viewProfile model.profile model.repos
+                viewProfile model.profile model.repos model.activity
 
 
-viewProfile : Maybe Profile -> Maybe (List Repo) -> Html Msg
-viewProfile maybeProfile maybeRepos =
-    case ( maybeProfile, maybeRepos ) of
-        ( Just profile, Just repos ) ->
+viewProfile : Maybe Profile -> Maybe (List Repo) -> Maybe Activity -> Html Msg
+viewProfile maybeProfile maybeRepos maybeActivity =
+    case ( maybeProfile, maybeRepos, maybeActivity ) of
+        ( Just profile, Just repos, Just activity ) ->
             div [ class "profile" ]
                 [ viewProfileSummary profile
-                , viewProfileCards profile repos
+                , viewProfileCards profile repos activity
                 ]
 
-        ( _, _ ) ->
+        ( _, _, _ ) ->
             div [] []
 
 
@@ -347,12 +347,12 @@ viewProfileSummary profile =
         ]
 
 
-viewProfileCards : Profile -> List Repo -> Html Msg
-viewProfileCards profile repos =
+viewProfileCards : Profile -> List Repo -> Activity -> Html Msg
+viewProfileCards profile repos activity =
     div [ class "card-container" ]
         [ viewReposCard profile repos
         , viewFollowersCard profile repos
-        , viewCreatedCard profile
+        , viewCreatedCard profile activity
         ]
 
 
@@ -410,22 +410,23 @@ viewFollowersCard profile repos =
         ]
 
 
-viewCreatedCard : Profile -> Html Msg
-viewCreatedCard profile =
+viewCreatedCard : Profile -> Activity -> Html Msg
+viewCreatedCard profile activity =
     div [ class "card" ]
         [ div [ class "card-body" ]
             [ div [ class "card-front" ]
                 [ span [ class "fa fa-clock card-icon" ] []
                 , div [ class "card-label" ] [ text "Account active since" ]
                 , div [ class "card-stat date-text" ] [ text (String.left 10 profile.createdAt) ]
-                , div [ class "card-stat date-text" ] [ text (String.slice 11 16 profile.createdAt) ]
+                , div [ class "card-stat time-text" ] [ text (String.slice 11 16 profile.createdAt) ]
                 ]
             , div [ class "card-back" ]
                 [ span [ class "fa fa-clock card-icon" ] []
-                , div [ class "card-label" ] [ text "Something else" ]
-                , div [ class "card-stat" ] [ text "TODO" ]
-                , div [ class "card-label" ] [ text "Another thing" ]
-                , div [ class "card-stat" ] [ text "TODO" ]
+                , div [ class "card-label" ] [ text "Last activity" ]
+                , div [ class "card-stat date-text" ] [ text (String.left 10 activity.createdAt) ]
+                , div [ class "card-stat time-text" ] [ text (String.slice 11 16 activity.createdAt) ]
+                , div [ class "card-label" ] [ text "Activity type" ]
+                , div [ class "card-stat date-text" ] [ text (String.left 10 activity.activityType) ]
                 ]
             ]
         ]
