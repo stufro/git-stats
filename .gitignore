@@ -4,3 +4,4 @@ package-lock.json
 /elm-stuff
 .env
 /dist
+.tags

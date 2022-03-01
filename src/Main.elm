@@ -79,6 +79,7 @@ initialModel =
     , searchText = ""
     , error = Nothing
     , loading = False
+
     -- , profile = Just { avatarUrl = "https://avatars.githubusercontent.com/u/2918581?v=4" , bio = "Source code and more for the most popular front-end framework in the world." , blog = "https://getbootstrap.com" , company = "" , createdAt = "2012-11-29T05:47:03Z" , email = "" , followers = 0 , following = 0 , gists = 0 , location = "San Francisco" , name = "Bootstrap" , repos = 24 , twitterUsername = "getbootstrap" , url = "https://api.github.com/users/twbs" , username = "twbs" }
     , profile = Nothing
     , repos = Just []
@@ -113,7 +114,7 @@ update msg model =
             )
 
         LoadProfile (Ok profile) ->
-            ( { model | profile = Just profile, loading = False }
+            ( { model | profile = Just profile }
             , Cmd.none
             )
 
@@ -194,23 +195,31 @@ repoDecoder =
         |> required "forks" int
         |> required "open_issues_count" int
 
+
 errorToString : Http.Error -> String
 errorToString error =
     case error of
         Http.BadUrl url ->
             "The URL " ++ url ++ " was invalid"
+
         Http.Timeout ->
             "Unable to reach the server, timed out"
+
         Http.NetworkError ->
             "Unable to reach the server, check your network connection"
+
         Http.BadStatus 500 ->
             "The server had a problem, try again later"
+
         Http.BadStatus 404 ->
             "Unable to find GitHub profile"
+
         Http.BadStatus _ ->
             "Unknown error"
+
         Http.BadBody errorMessage ->
             errorMessage
+
 
 
 -- VIEW
@@ -233,19 +242,23 @@ view model =
         , viewMainContent model
         ]
 
+
 viewMainContent : Model -> Html Msg
 viewMainContent model =
     if model.loading then
         div [ class "loading-spinner" ] []
+
     else
         case model.error of
             Just error ->
                 div [ class "error-toast" ]
-                    [ span [] [ text "An error occurred: "] 
+                    [ span [] [ text "An error occurred: " ]
                     , span [] [ text (errorToString error) ]
                     ]
+
             Nothing ->
                 viewProfile model.profile model.repos
+
 
 viewProfile : Maybe Profile -> Maybe (List Repo) -> Html Msg
 viewProfile maybeProfile maybeRepos =
