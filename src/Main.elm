@@ -41,6 +41,7 @@ type alias Model =
     , loading : Bool
     , profile : Maybe Profile
     , repos : Maybe (List Repo)
+    , activity : Maybe Activity
     }
 
 
@@ -72,6 +73,11 @@ type alias Repo =
     , openIssuesCount : Int
     }
 
+type alias Activity =
+    { activity_type : String
+    , created_at : String
+    }
+
 
 initialModel : Model
 initialModel =
@@ -83,6 +89,7 @@ initialModel =
     -- , profile = Just { avatarUrl = "https://avatars.githubusercontent.com/u/2918581?v=4" , bio = "Source code and more for the most popular front-end framework in the world." , blog = "https://getbootstrap.com" , company = "" , createdAt = "2012-11-29T05:47:03Z" , email = "" , followers = 0 , following = 0 , gists = 0 , location = "San Francisco" , name = "Bootstrap" , repos = 24 , twitterUsername = "getbootstrap" , url = "https://api.github.com/users/twbs" , username = "twbs" }
     , profile = Nothing
     , repos = Just []
+    , activity = Nothing
     }
 
 
@@ -95,6 +102,7 @@ type Msg
     | Search
     | LoadProfile (Result Http.Error Profile)
     | LoadRepos (Result Http.Error (List Repo))
+    | LoadActivity (Result Http.Error Activity)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -110,6 +118,7 @@ update msg model =
             , Cmd.batch
                 [ fetchProfile model.searchText model.githubPass
                 , fetchRepos model.searchText model.githubPass
+                , fetchActivity model.searchText model.githubPass
                 ]
             )
 
@@ -129,6 +138,16 @@ update msg model =
             )
 
         LoadRepos (Err error) ->
+            ( { model | error = Just error, loading = False }
+            , Cmd.none
+            )
+
+        LoadActivity (Ok activity) ->
+            ( { model | activity = Just activity }
+            , Cmd.none
+            )
+
+        LoadActivity (Err error) ->
             ( { model | error = Just error, loading = False }
             , Cmd.none
             )
@@ -155,6 +174,17 @@ fetchRepos usernameSearch githubPass =
         , url = "https://api.github.com/users/" ++ usernameSearch ++ "/repos?per_page=100"
         , body = Http.emptyBody
         , expect = Http.expectJson LoadRepos (list repoDecoder)
+        , timeout = Nothing
+        , tracker = Nothing
+        }
+fetchActivity : String -> String -> Cmd Msg
+fetchActivity usernameSearch githubPass =
+    Http.request
+        { method = "GET"
+        , headers = [ authorisationHeader githubPass ]
+        , url = "https://api.github.com/users/" ++ usernameSearch ++ "/events?per_page=1"
+        , body = Http.emptyBody
+        , expect = Http.expectJson LoadActivity (Json.Decode.index 0 activityDecoder)
         , timeout = Nothing
         , tracker = Nothing
         }
@@ -194,6 +224,12 @@ repoDecoder =
         |> required "stargazers_count" int
         |> required "forks" int
         |> required "open_issues_count" int
+
+activityDecoder : Decoder Activity
+activityDecoder =
+    succeed Activity
+        |> required "type" string
+        |> required "created_at" string
 
 
 errorToString : Http.Error -> String
