@@ -2,6 +2,8 @@
 
 Enter your GitHub username. See stats.
 
+![](demo.gif)
+
 ## Development
 ```bash
 yarn install
