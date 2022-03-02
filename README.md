@@ -9,4 +9,4 @@ Enter your GitHub username. See stats.
 yarn install
 yarn dev
 ```
-Open index.html in your browser.
+Open `assets/index.html` in your browser.
