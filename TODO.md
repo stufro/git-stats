@@ -14,4 +14,8 @@
 - [ ] Remove duplicate type alias in RepoStats
 - [ ] Handle race condition with 3 API calls + searching state
 - [ ] Better handle storing of repos and activity data
-  - [ ] Nest data under profile record (?)
+  - [ ] Nest data under profile record
+  - [ ] In the update function, do something like the below to build the new profile
+    ```elm
+      { model | profile = (setProfileActivity model.profile activity) }
+    ```
