@@ -426,7 +426,7 @@ viewCreatedCard profile activity =
                 , div [ class "card-stat date-text" ] [ text (String.left 10 activity.createdAt) ]
                 , div [ class "card-stat time-text" ] [ text (String.slice 11 16 activity.createdAt) ]
                 , div [ class "card-label" ] [ text "Activity type" ]
-                , div [ class "card-stat date-text" ] [ text (String.left 10 activity.activityType) ]
+                , div [ class "card-stat date-text" ] [ text activity.activityType ]
                 ]
             ]
         ]
