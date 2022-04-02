@@ -11,20 +11,25 @@ const router = express.Router();
 dotenv.config();
 
 router.get('/user/:name', async (req, res) => {
-  var response = await fetch(`http://api.github.com/users/${req.params.name}`);
+  var response = await fetch(`http://api.github.com/users/${req.params.name}`, {
+    headers: { "Authorization": `Basic ${process.env.GITHUB_PASSWORD}` }
+  });
   var data = await response.json();
-  console.log(response.headers);
   res.status(response.status).send(data);
 })
 
 router.get('/user/:name/repos', async (req, res) => {
-  var response = await fetch(`http://api.github.com/users/${req.params.name}/repos?per_page=100`);
+  var response = await fetch(`http://api.github.com/users/${req.params.name}/repos?per_page=100`, {
+    headers: { "Authorization": `Basic ${process.env.GITHUB_PASSWORD}` }
+  });
   var data = await response.json();
   res.status(response.status).send(data);
 })
 
 router.get('/user/:name/last_activity', async (req, res) => {
-  var response = await fetch(`http://api.github.com/users/${req.params.name}/events?per_page=1`);
+  var response = await fetch(`http://api.github.com/users/${req.params.name}/events?per_page=1`, {
+    headers: { "Authorization": `Basic ${process.env.GITHUB_PASSWORD}` }
+  });
   var data = await response.json();
   res.status(response.status).send(data);
 })
