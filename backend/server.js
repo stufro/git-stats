@@ -15,6 +15,7 @@ router.get('/user/:name', async (req, res) => {
     headers: { "Authorization": `Basic ${process.env.GITHUB_PASSWORD}` }
   });
   var data = await response.json();
+  res.set('Access-Control-Allow-Origin', '*');
   res.status(response.status).send(data);
 })
 
@@ -23,6 +24,7 @@ router.get('/user/:name/repos', async (req, res) => {
     headers: { "Authorization": `Basic ${process.env.GITHUB_PASSWORD}` }
   });
   var data = await response.json();
+  res.set('Access-Control-Allow-Origin', '*');
   res.status(response.status).send(data);
 })
 
@@ -31,6 +33,7 @@ router.get('/user/:name/last_activity', async (req, res) => {
     headers: { "Authorization": `Basic ${process.env.GITHUB_PASSWORD}` }
   });
   var data = await response.json();
+  res.set('Access-Control-Allow-Origin', '*');
   res.status(response.status).send(data);
 })
 

@@ -7,5 +7,5 @@ import '@fortawesome/fontawesome-free/js/brands.js'
 
 var app = Elm.Main.init({
   node: document.getElementById('elm-app'),
-  flags: ""
+  flags: process.env.ENVIRONMENT
 });

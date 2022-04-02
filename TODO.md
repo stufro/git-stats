@@ -7,6 +7,7 @@
 - [ ] Recent searches
 - [x] Handle API errors
 - [ ] Handle pagination in repos API
+- [ ] Handle empty events api response
 
 ## Refactoring
 - [x] Create separate module for repository stats

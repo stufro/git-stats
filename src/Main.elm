@@ -26,8 +26,8 @@ subscriptions _ =
 
 
 init : String -> ( Model, Cmd Msg )
-init flags =
-    ( initialModel, Cmd.none )
+init environment =
+    ( { initialModel | environment = environment }, Cmd.none )
 
 
 
@@ -35,7 +35,7 @@ init flags =
 
 
 type alias Model =
-    { githubPass : String
+    { environment : String
     , searchText : String
     , error : Maybe Http.Error
     , loading : Bool
@@ -81,7 +81,7 @@ type alias Activity =
 
 initialModel : Model
 initialModel =
-    { githubPass = ""
+    { environment = ""
     , searchText = ""
     , error = Nothing
     , loading = False
@@ -116,9 +116,9 @@ update msg model =
         Search ->
             ( { model | searchText = "", profile = Nothing, repos = Nothing, error = Nothing, loading = True }
             , Cmd.batch
-                [ fetchProfile model.searchText model.githubPass
-                , fetchRepos model.searchText model.githubPass
-                , fetchActivity model.searchText model.githubPass
+                [ fetchProfile model.searchText model.environment
+                , fetchRepos model.searchText model.environment
+                , fetchActivity model.searchText model.environment
                 ]
             )
 
@@ -154,11 +154,11 @@ update msg model =
 
 
 fetchProfile : String -> String -> Cmd Msg
-fetchProfile usernameSearch githubPass =
+fetchProfile usernameSearch environment =
     Http.request
         { method = "GET"
-        , headers = [ authorisationHeader githubPass ]
-        , url = "https://api.github.com/users/" ++ usernameSearch
+        , headers = [ ]
+        , url = (baseUrl environment) ++ usernameSearch
         , body = Http.emptyBody
         , expect = Http.expectJson LoadProfile profileDecoder
         , timeout = Nothing
@@ -167,22 +167,22 @@ fetchProfile usernameSearch githubPass =
 
 
 fetchRepos : String -> String -> Cmd Msg
-fetchRepos usernameSearch githubPass =
+fetchRepos usernameSearch environment =
     Http.request
         { method = "GET"
-        , headers = [ authorisationHeader githubPass ]
-        , url = "https://api.github.com/users/" ++ usernameSearch ++ "/repos?per_page=100"
+        , headers = [ ]
+        , url = (baseUrl environment) ++ usernameSearch ++ "/repos"
         , body = Http.emptyBody
         , expect = Http.expectJson LoadRepos (list repoDecoder)
         , timeout = Nothing
         , tracker = Nothing
         }
 fetchActivity : String -> String -> Cmd Msg
-fetchActivity usernameSearch githubPass =
+fetchActivity usernameSearch environment =
     Http.request
         { method = "GET"
-        , headers = [ authorisationHeader githubPass ]
-        , url = "https://api.github.com/users/" ++ usernameSearch ++ "/events?per_page=1"
+        , headers = [ ]
+        , url = (baseUrl environment) ++ usernameSearch ++ "/last_activity"
         , body = Http.emptyBody
         , expect = Http.expectJson LoadActivity (Json.Decode.index 0 activityDecoder)
         , timeout = Nothing
@@ -190,9 +190,12 @@ fetchActivity usernameSearch githubPass =
         }
 
 
-authorisationHeader : String -> Http.Header
-authorisationHeader password =
-    Http.header "Authorization" ("Basic " ++ password)
+baseUrl : String -> String
+baseUrl environment =
+    if environment == "production" then
+        "/.netlify/functions/server/user/"
+    else
+        "http://localhost:3000/.netlify/functions/server/user/"
 
 
 profileDecoder : Decoder Profile
