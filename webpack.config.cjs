@@ -33,7 +33,12 @@ module.exports = {
     },
     {
       test: /.html$/,
-      use: "file-loader"
+      use: {
+        loader: "file-loader",
+        options: {
+          name: "[name].html"
+        }
+      }
     }]
   }
 };
