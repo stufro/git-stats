@@ -36,7 +36,6 @@ router.get('/user/:name/last_activity', async (req, res) => {
 
 app.use(bodyParser.json());
 app.use('/.netlify/functions/server', router);
-
 export default app;
 const handler = serverless(app); 
 export { handler };

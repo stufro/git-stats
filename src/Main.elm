@@ -26,8 +26,8 @@ subscriptions _ =
 
 
 init : String -> ( Model, Cmd Msg )
-init pw =
-    ( { initialModel | githubPass = pw }, Cmd.none )
+init flags =
+    ( initialModel, Cmd.none )
 
 
 
