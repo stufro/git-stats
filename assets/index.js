@@ -8,5 +8,5 @@ import './index.html'
 
 var app = Elm.Main.init({
   node: document.getElementById('elm-app'),
-  flags: process.env.ENVIRONMENT
+  flags: process.env.ENVIRONMENT || "production"
 });
