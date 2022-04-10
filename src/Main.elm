@@ -390,7 +390,6 @@ viewReposCard profile repos =
                 , div [ class "card-stat" ] [ text (String.fromInt profile.repos) ]
                 , div [ class "card-label" ] [ text "Number of gists" ]
                 , div [ class "card-stat" ] [ text (String.fromInt profile.gists) ]
-                , span [ class "fa fa-rotate" ] []
                 ]
             , div [ class "card-back" ]
                 [ span [ class "fa fa-language card-icon" ] []
@@ -399,6 +398,7 @@ viewReposCard profile repos =
                 , div [ class "card-label" ] [ text ("Number of " ++ mostUsedLanguage ++ " repos") ]
                 , div [ class "card-stat" ] [ text (String.fromInt mostUsedLanguageCount) ]
                 ]
+            , span [ class "fa fa-rotate" ] []
             ]
         ]
 
@@ -421,6 +421,7 @@ viewFollowersCard profile repos =
                 , div [ class "card-label" ] [ text "Repo Forks" ]
                 , div [ class "card-stat" ] [ text (RepoStats.totalForks repos) ]
                 ]
+            , span [ class "fa fa-rotate" ] []
             ]
         ]
 
@@ -443,5 +444,6 @@ viewCreatedCard profile activity =
                 , div [ class "card-label" ] [ text "Activity type" ]
                 , div [ class "card-stat date-text" ] [ text activity.activityType ]
                 ]
+            , span [ class "fa fa-rotate" ] []
             ]
         ]

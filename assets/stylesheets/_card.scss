@@ -64,6 +64,15 @@
   margin-bottom: 2rem;
 }
 
+.fa-rotate {
+  align-self: flex-end;
+  position: absolute;
+  left: 155px;
+  bottom: 20px;
+  font-size: x-large;
+  animation: nudge 5s infinite;
+}
+
 .card-label {
   margin-bottom: 0.5rem;
 }
@@ -80,6 +89,17 @@
 
 .time-text {
   font-size: 5.25ch;
+}
+
+@keyframes nudge {
+  10% {
+    transform: rotate(60deg);
+  }
+
+  15% {
+    transform: rotate(0deg);
+  }
+  
 }
 
 @keyframes fade-in {
