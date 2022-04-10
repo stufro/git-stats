@@ -5,10 +5,12 @@ body {
 
 h1 {
   color: $primary;
+  font-size: 3rem;
+  margin-top: 2rem;
 }
 
 input {
-  font-size: 2vw;
+  font-size: 2rem;
   padding: 0.5rem;
   border: 0;
   border-radius: 4rem;
@@ -21,18 +23,17 @@ input {
 input:focus {
   outline: none;
   box-shadow: inset $primary 0 0 0 1px;
-
 }
 
 input::placeholder {
-  font-size: 2vw;
+  font-size: 2rem;
   text-align: center;
   transition: font-size 0.5s ease-in-out,
               margin-right 0.5s ease-in-out;
 }
 
 input:focus::placeholder {
-  font-size: 1.5vw;
+  font-size: 1rem;
   margin-right: 20vw;
 }
 
