@@ -11,8 +11,6 @@
 
 ## Refactoring
 - [x] Create separate module for repository stats
-- [ ] Improve tests, building example records
-- [ ] Remove duplicate type alias in RepoStats
 - [ ] Handle race condition with 3 API calls + searching state
 - [ ] Better handle storing of repos and activity data
   - [ ] Nest data under profile record
