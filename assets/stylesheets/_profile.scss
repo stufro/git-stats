@@ -1,13 +1,12 @@
 .profile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   width: 80%;
 }
 
 .profile-summary {
   display: flex;
-  align-self: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
   opacity: 0;
   animation-name: fade-in;
   animation-duration: 3s;
@@ -15,10 +14,12 @@
 }
 
 .profile-avatar {
+  display: flex;
+  justify-content: center;
+
   img {
     border-radius: 15rem;
     width: 10rem;
-    margin-right: 3rem;
   }
 }
 

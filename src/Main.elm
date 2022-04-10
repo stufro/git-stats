@@ -85,11 +85,12 @@ initialModel =
     , searchText = ""
     , error = Nothing
     , loading = False
-
-    -- , profile = Just { avatarUrl = "https://avatars.githubusercontent.com/u/2918581?v=4" , bio = "Source code and more for the most popular front-end framework in the world." , blog = "https://getbootstrap.com" , company = "" , createdAt = "2012-11-29T05:47:03Z" , email = "" , followers = 0 , following = 0 , gists = 0 , location = "San Francisco" , name = "Bootstrap" , repos = 24 , twitterUsername = "getbootstrap" , url = "https://api.github.com/users/twbs" , username = "twbs" }
-    , profile = Nothing
-    , repos = Just []
-    , activity = Nothing
+    , profile = Just { avatarUrl = "https://avatars.githubusercontent.com/u/2918581?v=4" , bio = "Source code and more for the most popular front-end framework in the world." , blog = "https://getbootstrap.com" , company = "" , createdAt = "2012-11-29T05:47:03Z" , email = "" , followers = 0 , following = 0 , gists = 0 , location = "San Francisco" , name = "Bootstrap" , repos = 24 , twitterUsername = "getbootstrap" , url = "https://api.github.com/users/twbs" , username = "twbs" }
+    , repos = Just [{description = "A free, open source, non-commercial home for musicians and their music", forksCount = 0, language = "Ruby", name = "alonetone", openIssuesCount = 0, starCount = 0}]
+    , activity = Just {activityType = "PushEvent", createdAt = "2022-04-10T19:17:06Z"}
+    -- , profile = Nothing
+    -- , repos = Just []
+    -- , activity = Nothing
     }
 
 
@@ -273,7 +274,7 @@ view model =
                 [ input
                     [ onInput UpdateSearchBox
                     , value model.searchText
-                    , placeholder "Enter GitHub Username:"
+                    , placeholder "GitHub Username:"
                     ]
                     []
                 ]
