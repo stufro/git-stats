@@ -10,6 +10,7 @@ import Json.Decode exposing (Decoder, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (optional, required)
 import Task exposing (attempt)
 import RepoStats exposing (mostUsedLanguage, totalForks, totalStars)
+import Html.Attributes exposing (autocomplete)
 
 
 main : Program String Model Msg
@@ -285,6 +286,7 @@ view model =
                     , value model.searchText
                     , id "username-input"
                     , placeholder "GitHub Username:"
+                    , autocomplete False
                     ]
                     []
                 ]
