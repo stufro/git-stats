@@ -8,7 +8,7 @@
 - [x] Handle API errors
 - [ ] Handle pagination in repos API
 - [ ] Handle empty events api response
-- [ ] Mobile friendly UI
+- [x] Mobile friendly UI
 
 ## Refactoring
 - [x] Create separate module for repository stats

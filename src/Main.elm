@@ -1,12 +1,14 @@
 module Main exposing (..)
 
 import Browser
+import Browser.Dom as Dom exposing (focus)
 import Html exposing (..)
-import Html.Attributes exposing (class, placeholder, src, value)
+import Html.Attributes exposing (class, placeholder, src, value, id)
 import Html.Events exposing (onInput, onSubmit)
 import Http
 import Json.Decode exposing (Decoder, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (optional, required)
+import Task exposing (attempt)
 import RepoStats exposing (mostUsedLanguage, totalForks, totalStars)
 
 
@@ -85,12 +87,12 @@ initialModel =
     , searchText = ""
     , error = Nothing
     , loading = False
-    , profile = Just { avatarUrl = "https://avatars.githubusercontent.com/u/2918581?v=4" , bio = "Source code and more for the most popular front-end framework in the world." , blog = "https://getbootstrap.com" , company = "" , createdAt = "2012-11-29T05:47:03Z" , email = "" , followers = 0 , following = 0 , gists = 0 , location = "San Francisco" , name = "Bootstrap" , repos = 24 , twitterUsername = "getbootstrap" , url = "https://api.github.com/users/twbs" , username = "twbs" }
-    , repos = Just [{description = "A free, open source, non-commercial home for musicians and their music", forksCount = 0, language = "Ruby", name = "alonetone", openIssuesCount = 0, starCount = 0}]
-    , activity = Just {activityType = "PushEvent", createdAt = "2022-04-10T19:17:06Z"}
-    -- , profile = Nothing
-    -- , repos = Just []
-    -- , activity = Nothing
+    -- , profile = Just { avatarUrl = "https://avatars.githubusercontent.com/u/2918581?v=4" , bio = "Source code and more for the most popular front-end framework in the world." , blog = "https://getbootstrap.com" , company = "" , createdAt = "2012-11-29T05:47:03Z" , email = "" , followers = 0 , following = 0 , gists = 0 , location = "San Francisco" , name = "Bootstrap" , repos = 24 , twitterUsername = "getbootstrap" , url = "https://api.github.com/users/twbs" , username = "twbs" }
+    -- , repos = Just [{description = "A free, open source, non-commercial home for musicians and their music", forksCount = 0, language = "Ruby", name = "alonetone", openIssuesCount = 0, starCount = 0}]
+    -- , activity = Just {activityType = "PushEvent", createdAt = "2022-04-10T19:17:06Z"}
+    , profile = Nothing
+    , repos = Just []
+    , activity = Nothing
     }
 
 
@@ -104,6 +106,7 @@ type Msg
     | LoadProfile (Result Http.Error Profile)
     | LoadRepos (Result Http.Error (List Repo))
     | LoadActivity (Result Http.Error Activity)
+    | FocusEvent (Result Dom.Error ())
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -120,6 +123,7 @@ update msg model =
                 [ fetchProfile model.searchText model.environment
                 , fetchRepos model.searchText model.environment
                 , fetchActivity model.searchText model.environment
+                , Dom.blur "username-input" |> Task.attempt FocusEvent
                 ]
             )
 
@@ -152,6 +156,11 @@ update msg model =
             ( { model | error = Just error, loading = False }
             , Cmd.none
             )
+
+        FocusEvent result ->
+            case result of
+                Err (Dom.NotFound _) -> ( model, Cmd.none )
+                Ok () -> ( model, Cmd.none )
 
 
 fetchProfile : String -> String -> Cmd Msg
@@ -274,6 +283,7 @@ view model =
                 [ input
                     [ onInput UpdateSearchBox
                     , value model.searchText
+                    , id "username-input"
                     , placeholder "GitHub Username:"
                     ]
                     []
@@ -380,6 +390,7 @@ viewReposCard profile repos =
                 , div [ class "card-stat" ] [ text (String.fromInt profile.repos) ]
                 , div [ class "card-label" ] [ text "Number of gists" ]
                 , div [ class "card-stat" ] [ text (String.fromInt profile.gists) ]
+                , span [ class "fa fa-rotate" ] []
                 ]
             , div [ class "card-back" ]
                 [ span [ class "fa fa-language card-icon" ] []
