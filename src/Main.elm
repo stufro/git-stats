@@ -10,6 +10,7 @@ import Json.Decode exposing (Decoder, int, list, maybe, string, succeed)
 import Json.Decode.Pipeline exposing (optional, required)
 import RepoStats exposing (mostUsedLanguage, totalForks, totalStars)
 import Task exposing (attempt)
+import Json.Decode.Pipeline exposing (hardcoded)
 
 
 main : Program String Model Msg
@@ -42,8 +43,6 @@ type alias Model =
     , error : Maybe Http.Error
     , loading : Bool
     , profile : Maybe Profile
-    , repos : Maybe (List Repo)
-    , activity : Maybe Activity
     }
 
 
@@ -58,11 +57,13 @@ type alias Profile =
     , email : String
     , bio : String
     , twitterUsername : String
-    , repos : Int
+    , repo_count : Int
     , gists : Int
     , followers : Int
     , following : Int
     , createdAt : String
+    , repos : Maybe (List Repo)
+    , activity : Maybe Activity
     }
 
 
@@ -93,8 +94,6 @@ initialModel =
     -- , repos = Just [{description = "A free, open source, non-commercial home for musicians and their music", forksCount = 0, language = "Ruby", name = "alonetone", openIssuesCount = 0, starCount = 0}]
     -- , activity = Just {activityType = "PushEvent", createdAt = "2022-04-10T19:17:06Z"}
     , profile = Nothing
-    , repos = Just []
-    , activity = Nothing
     }
 
 
@@ -120,7 +119,7 @@ update msg model =
             )
 
         Search ->
-            ( { model | searchText = "", profile = Nothing, repos = Nothing, error = Nothing, loading = True }
+            ( { model | searchText = "", profile = Nothing, error = Nothing, loading = True }
             , Cmd.batch
                 [ fetchProfile model.searchText model.environment
                 , fetchRepos model.searchText model.environment
@@ -140,7 +139,7 @@ update msg model =
             )
 
         LoadRepos (Ok repos) ->
-            ( { model | repos = Just repos, loading = False }
+            ( { model | profile = (setProfileRepos model.profile repos), loading = False }
             , Cmd.none
             )
 
@@ -150,14 +149,12 @@ update msg model =
             )
 
         LoadActivity (Ok (Just activity)) ->
-            ( { model | activity = Just activity }
+            ( { model | profile = (setProfileActivity model.profile activity) }
             , Cmd.none
             )
 
         LoadActivity (Ok Nothing) ->
-            ( { model | activity = Nothing }
-            , Cmd.none
-            )
+            ( model, Cmd.none )
 
         LoadActivity (Err error) ->
             ( { model | error = Just error, loading = False }
@@ -172,6 +169,13 @@ update msg model =
                 Ok () ->
                     ( model, Cmd.none )
 
+setProfileRepos : Maybe Profile -> (List Repo) -> Maybe Profile
+setProfileRepos maybeProfile repos =
+    Maybe.map (\profile -> { profile | repos = Just repos }) maybeProfile
+
+setProfileActivity : Maybe Profile -> Activity -> Maybe Profile
+setProfileActivity maybeProfile activity =
+    Maybe.map (\profile -> { profile | activity = Just activity }) maybeProfile
 
 fetchProfile : String -> String -> Cmd Msg
 fetchProfile usernameSearch environment =
@@ -239,6 +243,8 @@ profileDecoder =
         |> required "followers" int
         |> required "following" int
         |> required "created_at" string
+        |> hardcoded Nothing
+        |> hardcoded Nothing
 
 
 repoDecoder : Decoder Repo
@@ -324,19 +330,19 @@ viewMainContent model =
                     ]
 
             Nothing ->
-                viewProfile model.profile model.repos model.activity
+                viewProfile model.profile
 
 
-viewProfile : Maybe Profile -> Maybe (List Repo) -> Maybe Activity -> Html Msg
-viewProfile maybeProfile maybeRepos maybeActivity =
-    case ( maybeProfile, maybeRepos, maybeActivity ) of
-        ( Just profile, Just repos, Just activity ) ->
+viewProfile : Maybe Profile -> Html Msg
+viewProfile maybeProfile =
+    case maybeProfile of
+        Just profile ->
             div [ class "profile" ]
                 [ viewProfileSummary profile
-                , viewProfileCards profile repos activity
+                , viewProfileCards profile
                 ]
 
-        ( _, _, _ ) ->
+        Nothing ->
             div [] []
 
 
@@ -378,82 +384,116 @@ viewProfileSummary profile =
         ]
 
 
-viewProfileCards : Profile -> List Repo -> Activity -> Html Msg
-viewProfileCards profile repos activity =
+viewProfileCards : Profile -> Html Msg
+viewProfileCards profile =
     div [ class "card-container" ]
-        [ viewReposCard profile repos
-        , viewFollowersCard profile repos
-        , viewCreatedCard profile activity
+        [ viewReposCard profile
+        , viewFollowersCard profile
+        , viewActivityCard profile
         ]
 
 
-viewReposCard : Profile -> List Repo -> Html Msg
-viewReposCard profile repos =
-    let
-        mostUsedLanguageTuple =
-            RepoStats.mostUsedLanguage repos
-
-        mostUsedLanguage =
-            Tuple.first mostUsedLanguageTuple
-
-        mostUsedLanguageCount =
-            Tuple.second mostUsedLanguageTuple
-    in
+viewReposCard : Profile -> Html Msg
+viewReposCard profile =
     div [ class "card" ]
         [ div [ class "card-body" ]
-            [ div [ class "card-front" ]
-                [ span [ class "fa fa-code card-icon" ] []
-                , div [ class "card-label" ] [ text "Number of repos" ]
-                , div [ class "card-stat" ] [ text (String.fromInt profile.repos) ]
-                , div [ class "card-label" ] [ text "Number of gists" ]
-                , div [ class "card-stat" ] [ text (String.fromInt profile.gists) ]
-                ]
-            , div [ class "card-back" ]
+            [ viewReposCardFront profile
+            , viewReposCardBack profile.repos
+            , span [ class "fa fa-rotate" ] []
+            ]
+        ]
+
+viewReposCardFront : Profile -> Html Msg
+viewReposCardFront profile =
+    div [ class "card-front" ]
+            [ span [ class "fa fa-code card-icon" ] []
+            , div [ class "card-label" ] [ text "Number of repos" ]
+            , div [ class "card-stat" ] [ text (String.fromInt profile.repo_count) ]
+            , div [ class "card-label" ] [ text "Number of gists" ]
+            , div [ class "card-stat" ] [ text (String.fromInt profile.gists) ]
+            ]
+
+viewReposCardBack : Maybe (List Repo) -> Html Msg
+viewReposCardBack maybeRepos =
+    case maybeRepos of
+        Just repos ->
+            let
+                mostUsedLanguageTuple = RepoStats.mostUsedLanguage repos
+                mostUsedLanguage = Tuple.first mostUsedLanguageTuple
+                mostUsedLanguageCount = Tuple.second mostUsedLanguageTuple
+            in
+            div [ class "card-back" ]
+                    [ span [ class "fa fa-language card-icon" ] []
+                    , div [ class "card-label" ] [ text "Most used language" ]
+                    , div [ class "card-stat" ] [ text mostUsedLanguage ]
+                    , div [ class "card-label" ] [ text ("Number of " ++ mostUsedLanguage ++ " repos") ]
+                    , div [ class "card-stat" ] [ text (String.fromInt mostUsedLanguageCount) ]
+                    ]
+        Nothing ->
+            div [ class "card-back" ]
                 [ span [ class "fa fa-language card-icon" ] []
-                , div [ class "card-label" ] [ text "Most used language" ]
-                , div [ class "card-stat" ] [ text mostUsedLanguage ]
-                , div [ class "card-label" ] [ text ("Number of " ++ mostUsedLanguage ++ " repos") ]
-                , div [ class "card-stat" ] [ text (String.fromInt mostUsedLanguageCount) ]
-                ]
+                , text "No repository data available" ]
+
+viewFollowersCard : Profile ->  Html Msg
+viewFollowersCard profile =
+    div [ class "card" ]
+        [ div [ class "card-body" ]
+            [ viewFollowersCardFront profile
+            , viewFollowersCardBack profile.repos
             , span [ class "fa fa-rotate" ] []
             ]
         ]
 
+viewFollowersCardFront : Profile -> Html Msg
+viewFollowersCardFront profile =
+    div [ class "card-front" ]
+            [ span [ class "fa fa-user-group card-icon" ] []
+            , div [ class "card-label" ] [ text "Followers" ]
+            , div [ class "card-stat" ] [ text (String.fromInt profile.followers) ]
+            , div [ class "card-label" ] [ text "Following" ]
+            , div [ class "card-stat" ] [ text (String.fromInt profile.following) ]
+            ]
 
-viewFollowersCard : Profile -> List Repo -> Html Msg
-viewFollowersCard profile repos =
+viewFollowersCardBack : Maybe (List Repo) -> Html Msg
+viewFollowersCardBack maybeRepos =
+    case maybeRepos of
+        Just repos ->
+            div [ class "card-back" ]
+                    [ span [ class "fa fa-star card-icon" ] []
+                    , div [ class "card-label" ] [ text "Repo Stars" ]
+                    , div [ class "card-stat" ] [ text (RepoStats.totalStars repos) ]
+                    , div [ class "card-label" ] [ text "Repo Forks" ]
+                    , div [ class "card-stat" ] [ text (RepoStats.totalForks repos) ]
+                    ]
+        Nothing ->
+            div [ class "card-back" ]
+                [ span [ class "fa fa-start card-icon" ] []
+                , text "No repository data available" ]
+
+viewActivityCard : Profile ->  Html Msg
+viewActivityCard profile =
     div [ class "card" ]
         [ div [ class "card-body" ]
-            [ div [ class "card-front" ]
-                [ span [ class "fa fa-user-group card-icon" ] []
-                , div [ class "card-label" ] [ text "Followers" ]
-                , div [ class "card-stat" ] [ text (String.fromInt profile.followers) ]
-                , div [ class "card-label" ] [ text "Following" ]
-                , div [ class "card-stat" ] [ text (String.fromInt profile.following) ]
-                ]
-            , div [ class "card-back" ]
-                [ span [ class "fa fa-star card-icon" ] []
-                , div [ class "card-label" ] [ text "Repo Stars" ]
-                , div [ class "card-stat" ] [ text (RepoStats.totalStars repos) ]
-                , div [ class "card-label" ] [ text "Repo Forks" ]
-                , div [ class "card-stat" ] [ text (RepoStats.totalForks repos) ]
-                ]
+            [ viewActivityCardFront profile
+            , viewActivityCardBack profile.activity
             , span [ class "fa fa-rotate" ] []
             ]
         ]
 
+viewActivityCardFront : Profile -> Html Msg
+viewActivityCardFront profile =
+    div [ class "card-front" ]
+            [ span [ class "fa fa-clock card-icon" ] []
+            , div [ class "card-label" ] [ text "Account active since" ]
+            , div [ class "card-stat date-text" ] [ text (String.left 10 profile.createdAt) ]
+            , div [ class "card-stat time-text" ] [ text (String.slice 11 16 profile.createdAt) ]
+            ]
 
-viewCreatedCard : Profile -> Activity -> Html Msg
-viewCreatedCard profile activity =
-    div [ class "card" ]
-        [ div [ class "card-body" ]
-            [ div [ class "card-front" ]
-                [ span [ class "fa fa-clock card-icon" ] []
-                , div [ class "card-label" ] [ text "Account active since" ]
-                , div [ class "card-stat date-text" ] [ text (String.left 10 profile.createdAt) ]
-                , div [ class "card-stat time-text" ] [ text (String.slice 11 16 profile.createdAt) ]
-                ]
-            , div [ class "card-back" ]
+viewActivityCardBack : Maybe Activity -> Html Msg
+viewActivityCardBack maybeActivity =
+    case maybeActivity of
+        Just activity ->
+            div [ class "card-back" ]
                 [ span [ class "fa fa-clock card-icon" ] []
                 , div [ class "card-label" ] [ text "Last activity" ]
                 , div [ class "card-stat date-text" ] [ text (String.left 10 activity.createdAt) ]
@@ -461,6 +501,8 @@ viewCreatedCard profile activity =
                 , div [ class "card-label" ] [ text "Activity type" ]
                 , div [ class "card-stat date-text" ] [ text activity.activityType ]
                 ]
-            , span [ class "fa fa-rotate" ] []
-            ]
-        ]
+        Nothing ->
+            div [ class "card-back" ]
+                [ span [ class "fa fa-clock card-icon" ] []
+                , text "No activity data available" ]
+                
