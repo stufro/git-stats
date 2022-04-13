@@ -7,7 +7,7 @@
 - [ ] Recent searches
 - [x] Handle API errors
 - [ ] Handle pagination in repos API
-- [ ] Handle empty events api response
+- [x] Handle empty events api response
 - [x] Mobile friendly UI
 
 ## Refactoring
@@ -19,5 +19,5 @@
     ```elm
       { model | profile = (setProfileActivity model.profile activity) }
     ```
-  - [ ] Set repos to `Nothing` when empty array is returned
+  - [ ] Set repos to `Nothing` when empty array is returned from API
 - [ ] Write tests for backend
