@@ -3,14 +3,13 @@ module Main exposing (..)
 import Browser
 import Browser.Dom as Dom exposing (focus)
 import Html exposing (..)
-import Html.Attributes exposing (class, placeholder, src, value, id)
+import Html.Attributes exposing (autocomplete, class, id, placeholder, src, value)
 import Html.Events exposing (onInput, onSubmit)
 import Http
-import Json.Decode exposing (Decoder, int, list, string, succeed, maybe)
+import Json.Decode exposing (Decoder, int, list, maybe, string, succeed)
 import Json.Decode.Pipeline exposing (optional, required)
-import Task exposing (attempt)
 import RepoStats exposing (mostUsedLanguage, totalForks, totalStars)
-import Html.Attributes exposing (autocomplete)
+import Task exposing (attempt)
 
 
 main : Program String Model Msg
@@ -76,6 +75,7 @@ type alias Repo =
     , openIssuesCount : Int
     }
 
+
 type alias Activity =
     { activityType : String
     , createdAt : String
@@ -88,6 +88,7 @@ initialModel =
     , searchText = ""
     , error = Nothing
     , loading = False
+
     -- , profile = Just { avatarUrl = "https://avatars.githubusercontent.com/u/2918581?v=4" , bio = "Source code and more for the most popular front-end framework in the world." , blog = "https://getbootstrap.com" , company = "" , createdAt = "2012-11-29T05:47:03Z" , email = "" , followers = 0 , following = 0 , gists = 0 , location = "San Francisco" , name = "Bootstrap" , repos = 24 , twitterUsername = "getbootstrap" , url = "https://api.github.com/users/twbs" , username = "twbs" }
     -- , repos = Just [{description = "A free, open source, non-commercial home for musicians and their music", forksCount = 0, language = "Ruby", name = "alonetone", openIssuesCount = 0, starCount = 0}]
     -- , activity = Just {activityType = "PushEvent", createdAt = "2022-04-10T19:17:06Z"}
@@ -165,16 +166,19 @@ update msg model =
 
         FocusEvent result ->
             case result of
-                Err (Dom.NotFound _) -> ( model, Cmd.none )
-                Ok () -> ( model, Cmd.none )
+                Err (Dom.NotFound _) ->
+                    ( model, Cmd.none )
+
+                Ok () ->
+                    ( model, Cmd.none )
 
 
 fetchProfile : String -> String -> Cmd Msg
 fetchProfile usernameSearch environment =
     Http.request
         { method = "GET"
-        , headers = [ ]
-        , url = (baseUrl environment) ++ usernameSearch
+        , headers = []
+        , url = baseUrl environment ++ usernameSearch
         , body = Http.emptyBody
         , expect = Http.expectJson LoadProfile profileDecoder
         , timeout = Nothing
@@ -186,19 +190,21 @@ fetchRepos : String -> String -> Cmd Msg
 fetchRepos usernameSearch environment =
     Http.request
         { method = "GET"
-        , headers = [ ]
-        , url = (baseUrl environment) ++ usernameSearch ++ "/repos"
+        , headers = []
+        , url = baseUrl environment ++ usernameSearch ++ "/repos"
         , body = Http.emptyBody
         , expect = Http.expectJson LoadRepos (list repoDecoder)
         , timeout = Nothing
         , tracker = Nothing
         }
+
+
 fetchActivity : String -> String -> Cmd Msg
 fetchActivity usernameSearch environment =
     Http.request
         { method = "GET"
-        , headers = [ ]
-        , url = (baseUrl environment) ++ usernameSearch ++ "/last_activity"
+        , headers = []
+        , url = baseUrl environment ++ usernameSearch ++ "/last_activity"
         , body = Http.emptyBody
         , expect = Http.expectJson LoadActivity activityDecoder
         , timeout = Nothing
@@ -210,6 +216,7 @@ baseUrl : String -> String
 baseUrl environment =
     if environment == "production" then
         "/.netlify/functions/server/user/"
+
     else
         "http://localhost:3000/.netlify/functions/server/user/"
 
@@ -244,11 +251,14 @@ repoDecoder =
         |> required "forks" int
         |> required "open_issues_count" int
 
+
 activityDecoder : Decoder (Maybe Activity)
 activityDecoder =
-    maybe (succeed Activity
-        |> required "type" string
-        |> required "created_at" string)
+    maybe
+        (succeed Activity
+            |> required "type" string
+            |> required "created_at" string
+        )
 
 
 errorToString : Http.Error -> String

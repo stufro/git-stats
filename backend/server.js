@@ -21,7 +21,7 @@ router.get('/user/:name/repos', async (req, res) => {
 
 router.get('/user/:name/last_activity', async (req, res) => {
   var githubResponse = await githubRequest(`${req.params.name}/events?per_page=1`, res);
-  res.status(githubResponse.status).send({});
+  res.status(githubResponse.status).send(githubResponse.data[0] || {});
 })
 
 async function githubRequest(endpoint, res) {
