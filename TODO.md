@@ -19,3 +19,4 @@
     ```elm
       { model | profile = (setProfileActivity model.profile activity) }
     ```
+- [ ] Write tests for backend

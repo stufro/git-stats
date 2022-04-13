@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (class, placeholder, src, value, id)
 import Html.Events exposing (onInput, onSubmit)
 import Http
-import Json.Decode exposing (Decoder, int, list, string, succeed)
+import Json.Decode exposing (Decoder, int, list, string, succeed, maybe)
 import Json.Decode.Pipeline exposing (optional, required)
 import Task exposing (attempt)
 import RepoStats exposing (mostUsedLanguage, totalForks, totalStars)
@@ -106,7 +106,7 @@ type Msg
     | Search
     | LoadProfile (Result Http.Error Profile)
     | LoadRepos (Result Http.Error (List Repo))
-    | LoadActivity (Result Http.Error Activity)
+    | LoadActivity (Result Http.Error (Maybe Activity))
     | FocusEvent (Result Dom.Error ())
 
 
@@ -148,8 +148,13 @@ update msg model =
             , Cmd.none
             )
 
-        LoadActivity (Ok activity) ->
+        LoadActivity (Ok (Just activity)) ->
             ( { model | activity = Just activity }
+            , Cmd.none
+            )
+
+        LoadActivity (Ok Nothing) ->
+            ( { model | activity = Nothing }
             , Cmd.none
             )
 
@@ -195,7 +200,7 @@ fetchActivity usernameSearch environment =
         , headers = [ ]
         , url = (baseUrl environment) ++ usernameSearch ++ "/last_activity"
         , body = Http.emptyBody
-        , expect = Http.expectJson LoadActivity (Json.Decode.index 0 activityDecoder)
+        , expect = Http.expectJson LoadActivity activityDecoder
         , timeout = Nothing
         , tracker = Nothing
         }
@@ -239,11 +244,11 @@ repoDecoder =
         |> required "forks" int
         |> required "open_issues_count" int
 
-activityDecoder : Decoder Activity
+activityDecoder : Decoder (Maybe Activity)
 activityDecoder =
-    succeed Activity
+    maybe (succeed Activity
         |> required "type" string
-        |> required "created_at" string
+        |> required "created_at" string)
 
 
 errorToString : Http.Error -> String
