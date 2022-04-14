@@ -12,7 +12,7 @@
 
 ## Refactoring
 - [x] Create separate module for repository stats
-- [ ] Handle race condition with 3 API calls + searching state
+- [x] Handle race condition with 3 API calls + searching state
 - [x] Better handle storing of repos and activity data
   - [x] Nest data under profile record
   - [x] In the update function, do something like the below to build the new profile

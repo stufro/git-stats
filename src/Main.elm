@@ -118,18 +118,16 @@ update msg model =
             )
 
         Search ->
-            ( { model | searchText = "", profile = Nothing, error = Nothing, loading = True }
+            ( { model | profile = Nothing, error = Nothing, loading = True }
             , Cmd.batch
                 [ fetchProfile model.searchText model.environment
-                , fetchRepos model.searchText model.environment
-                , fetchActivity model.searchText model.environment
                 , Dom.blur "username-input" |> Task.attempt FocusEvent
                 ]
             )
 
         LoadProfile (Ok profile) ->
             ( { model | profile = Just profile }
-            , Cmd.none
+            , fetchActivity model.searchText model.environment
             )
 
         LoadProfile (Err error) ->
@@ -137,25 +135,25 @@ update msg model =
             , Cmd.none
             )
 
+        LoadActivity (Ok (Just activity)) ->
+            ( { model | profile = setProfileActivity model.profile activity }
+            , fetchRepos model.searchText model.environment
+            )
+
+        LoadActivity (Ok Nothing) ->
+            ( model, fetchRepos model.searchText model.environment )
+
+        LoadActivity (Err error) ->
+            ( { model | error = Just error, loading = False }
+            , fetchRepos model.searchText model.environment
+            )
+
         LoadRepos (Ok repos) ->
-            ( { model | profile = setProfileRepos model.profile repos, loading = False }
+            ( { model | profile = setProfileRepos model.profile repos, searchText = "", loading = False }
             , Cmd.none
             )
 
         LoadRepos (Err error) ->
-            ( { model | error = Just error, loading = False }
-            , Cmd.none
-            )
-
-        LoadActivity (Ok (Just activity)) ->
-            ( { model | profile = setProfileActivity model.profile activity }
-            , Cmd.none
-            )
-
-        LoadActivity (Ok Nothing) ->
-            ( model, Cmd.none )
-
-        LoadActivity (Err error) ->
             ( { model | error = Just error, loading = False }
             , Cmd.none
             )
