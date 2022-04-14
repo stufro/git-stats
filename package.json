@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "css-loader": "^6.6.0",
+    "jest": "^27.5.1",
     "nodemon": "^2.0.15",
     "sass": "^1.49.8",
     "sass-loader": "^12.6.0",
@@ -30,6 +31,7 @@
   "scripts": {
     "build": "webpack --mode production",
     "dev": "webpack --mode development",
-    "watch": "webpack --mode=development --watch --progress --color"
+    "watch": "webpack --mode=development --watch --progress --color",
+    "test": "jest"
   }
 }
