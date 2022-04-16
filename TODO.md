@@ -3,10 +3,10 @@
 - [x] Make flipable cards
 - [x] Add most used language
 - [x] Add loading spinner
-- [ ] Make profile data clickable
+- [x] Make profile data clickable
 - [ ] Recent searches
 - [x] Handle API errors
-- [ ] Handle pagination in repos API
+- [x] Handle pagination in repos API
 - [x] Handle empty events api response
 - [x] Mobile friendly UI
 
@@ -20,4 +20,4 @@
       { model | profile = (setProfileActivity model.profile activity) }
     ```
   - [x] Set repos to `Nothing` when empty array is returned from API
-- [ ] Write tests for backend
+- [x] Write tests for backend

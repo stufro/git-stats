@@ -10,6 +10,7 @@ import Json.Decode exposing (Decoder, int, list, maybe, string, succeed)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import RepoStats exposing (mostUsedLanguage, totalForks, totalStars)
 import Task exposing (attempt)
+import Html.Attributes exposing (href)
 
 
 main : Program String Model Msg
@@ -378,11 +379,13 @@ viewProfileSummary profile =
                 ]
             , div [ class "profile-meta-data" ]
                 [ div [] [ i [ class "fa fa-link" ] [] ]
-                , span [] [ text profile.blog ]
+                , a [ href profile.blog ]
+                    [ text profile.blog ]
                 ]
             , div [ class "profile-meta-data" ]
                 [ div [] [ i [ class "fa fa-at" ] [] ]
-                , span [] [ text profile.email ]
+                , a [ href ("mailto:" ++ profile.email) ]
+                    [ text profile.email ]
                 ]
             , div [ class "profile-meta-data" ]
                 [ div [] [ i [ class "fa fa-brands fa-twitter" ] [] ]
