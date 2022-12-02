@@ -1,10 +1,10 @@
 'use strict';
 
-import fetch from "node-fetch"
 import dotenv from "dotenv"
 import express from "express"
 import serverless from "serverless-http"
 import bodyParser from "body-parser"
+import fetch from "node-fetch"
 const app = express();
 const router = express.Router();
 dotenv.config();
@@ -51,5 +51,4 @@ async function githubRequest(endpoint, res) {
 app.use(bodyParser.json());
 app.use('/.netlify/functions/server', router);
 export default app;
-const handler = serverless(app); 
-export { handler };
+export const handler = serverless(app);
