@@ -10,7 +10,7 @@ yarn install
 yarn dev
 node local-server.js
 ```
-Open `assets/index.html` in your browser.
+Open `dist/index.html` in your browser.
 
 ## Testing
 ```bash
