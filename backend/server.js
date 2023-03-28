@@ -40,7 +40,7 @@ router.get('/user/:name/last_activity', async (req, res) => {
 })
 
 async function githubRequest(endpoint, res) {
-  var response = await fetch(`http://api.github.com/users/${endpoint}`, {
+  var response = await fetch(`https://api.github.com/users/${endpoint}`, {
     headers: { "Authorization": `Basic ${process.env.GITHUB_PASSWORD}` }
   });
   var data = await response.json();
