@@ -2,3 +2,6 @@
   command = "yarn install && yarn build"
   functions = "backend"
   node_bundler = "esbuild"
+
+[functions]
+  node_bundler = "esbuild"
