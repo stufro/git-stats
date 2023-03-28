@@ -51,4 +51,4 @@ async function githubRequest(endpoint, res) {
 app.use(bodyParser.json());
 app.use('/.netlify/functions/server', router);
 export default app;
-const { handler } = serverless(app);
+export const handler = serverless(app);
